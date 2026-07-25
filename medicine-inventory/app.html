@@ -170,8 +170,8 @@
                     <form id="add-medicine-form" autocomplete="off">
                         
                         <div class="form-group">
-                            <label for="med-brand">Trade / Brand Name</label>
-                            <input type="text" id="med-brand" placeholder="e.g., Xyzal" required>
+                            <label for="med-brand">Trade / Generic Name</label>
+                            <input type="text" id="med-brand" placeholder="e.g., Azithromycin or Xyzal" required>
                             <div id="autocomplete-results" class="autocomplete-dropdown hidden"></div>
                         </div>
 
@@ -224,13 +224,13 @@
                         </div>
                         
                         <div class="form-group">
-                            <label for="med-salts">Generic / Salts</label>
-                            <input type="text" id="med-salts" placeholder="e.g., Levocetirizine">
+                            <label for="med-salts">Formulation / Salts</label>
+                            <input type="text" id="med-salts" placeholder="e.g., Azithromycin">
                         </div>
                         
                         <div class="form-group">
                             <label for="med-mfg">Manufacturer</label>
-                            <input type="text" id="med-mfg" placeholder="e.g., Dr. Reddy's Laboratories">
+                            <input type="text" id="med-mfg" placeholder="e.g., Pfizer">
                         </div>
 
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
@@ -307,7 +307,7 @@
             if (desc.includes('inh') || desc.includes('aer') || desc.includes('spray')) return 'inhaler';
             if (desc.includes('oint') || desc.includes('crea') || desc.includes('gel') || desc.includes('lot')) return 'ointment';
             
-            return 'pill'; // Default fallback for tablets, pills, lozenges
+            return 'pill';
         }
 
         medBrandInput.addEventListener('input', (e) => {
@@ -363,7 +363,7 @@
                 const seenBrands = new Set();
                 
                 rawSuggestions.forEach(item => {
-                    const key = item.brand + (item.mfg || ''); // Differentiate by mfg if brand is identical
+                    const key = item.brand + (item.mfg || ''); 
                     if (!seenBrands.has(key)) {
                         seenBrands.add(key);
                         item.mappedType = detectMedicineType(item.typeStr);
@@ -394,12 +394,18 @@
                     `;
                     
                     div.onclick = () => {
-                        // 1. Fill Text Inputs
+                        // 1. Fill Brand Input
                         medBrandInput.value = item.brand.replace(/\b\w/g, c => c.toUpperCase());
-                        if(item.salt) medSaltsInput.value = item.salt.replace(/\b\w/g, c => c.toUpperCase());
+                        
+                        // --- NEW: SMART SALT FALLBACK LOGIC ---
+                        // If item.salt exists, use it. Otherwise, assume the brand name IS the generic salt.
+                        const finalSalt = item.salt || item.brand;
+                        medSaltsInput.value = finalSalt.replace(/\b\w/g, c => c.toUpperCase());
+                        
+                        // 3. Fill Manufacturer if available
                         if(item.mfg) medMfgInput.value = item.mfg;
                         
-                        // 2. Dynamically click the correct Radio Button icon
+                        // 4. Dynamically click the correct Radio Button icon
                         const targetRadio = document.querySelector(`input[value="${item.mappedType}"]`);
                         if(targetRadio) targetRadio.checked = true;
 
@@ -465,7 +471,12 @@
 
             const medIcon = icons[data.type] || icons['pill'];
             const displayBrand = data.brand || data.name || 'Unknown';
-            const displaySalt = data.salts ? `<div class="med-salt-text">${escapeHTML(data.salts)}</div>` : '';
+            
+            // Only render salt if it's different from the brand to keep cards clean
+            const displaySalt = (data.salts && data.salts.toLowerCase() !== displayBrand.toLowerCase()) 
+                                ? `<div class="med-salt-text">${escapeHTML(data.salts)}</div>` 
+                                : '';
+                                
             const displayMfg = data.manufacturer ? `<div class="med-mfg-text">By ${escapeHTML(data.manufacturer)}</div>` : '';
 
             card.innerHTML = `
@@ -529,7 +540,6 @@
                 document.getElementById('med-qty').value = '';
                 document.getElementById('med-exp').value = '';
                 
-                // Reset radio to default pill
                 document.getElementById('type-pill').checked = true;
                 autocompleteResults.classList.add('hidden'); 
             } catch (error) {

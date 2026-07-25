@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        if (window.self !== window.top) {
+            window.top.location.href = window.location.href;
+        }
+    </script>
+
+    <meta charset="UTF-8">
+    
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self';
+        script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://cdn.jsdelivr.net;
+        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net;
+        font-src 'self' https://fonts.gstatic.com;
+        img-src 'self' data: https://gautam-anurag.github.io https://www.gstatic.com https://lh3.googleusercontent.com https://flagcdn.com;
+        connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://ipapi.co;
+        frame-src 'self' https://qubit.firebaseapp.com;
+        object-src 'none';
+        base-uri 'self';
+    ">
+
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#ffffff" id="theme-color-meta">
+    <title>Qubit | Sign In</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Roboto @ Google Fonts -->
+    <!-- font-family: "Roboto", sans-serif; -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.5/build/css/intlTelInput.css">
+    <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.5/build/js/intlTelInput.min.js"></script>
+
+    <link rel="icon" href="https://gautam-anurag.github.io/qubit/assets/qubit-icon.png" type="image/x-icon">
+    <link rel="apple-touch-icon" href="https://gautam-anurag.github.io/qubit/assets/qubit-icon.png">
+
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const metaTheme = document.getElementById('theme-color-meta');
+            
+            if (savedTheme === 'dark' || (!savedTheme && systemDark)) {
+                document.documentElement.classList.add('dark');
+                metaTheme.setAttribute('content', '#000000');
+            } else {
+                document.documentElement.classList.remove('dark');
+                metaTheme.setAttribute('content', '#ffffff');
+            }
+        })();
+    </script>
+
+    <style>
+        :root {
+            --bg-page: #ffffff;
+            --bg-panel: #ffffff;
+            --bg-input: #f3f4f6;
+            --text-main: #1a1a1a;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --border-input: transparent;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success: #10b981;
+            --error: #ef4444;
+            --radius-input: 12px;
+            --radius-btn: 12px;
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        html.dark {
+            --bg-page: #000000;
+            --bg-panel: #000000;
+            --bg-input: #1f2937;
+            --text-main: #f9fafb;
+            --text-muted: #9ca3af;
+            --border-color: #374151;
+            --border-input: #374151;
+            --primary: #3b82f6;
+            --primary-hover: #60a5fa;
+            --shadow-card: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+        }
+
+        .qubit-multicolor {
+            font-family: "Roboto", sans-serif;
+            background: linear-gradient(to right, #b6fbff, #83a4d4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            height: 100svh;
+            width: 100%;
+            overflow: hidden;
+            transition: background-color 0.3s ease;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        button { font-family: inherit; }
+
+        .layout-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            height: 100%;
+            width: 100%;
+        }
+
+        .hero-section {
+            display: none;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            background-image: url("https://gautam-anurag.github.io/qubit/assets/backgrounds/1.jpg");
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 4rem;
+            color: white;
+        }
+
+        .hero-text h2 { font-size: 2.6rem; margin-bottom: 1rem; font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; }
+        .hero-text p { font-size: 1rem; opacity: 0.9; max-width: 600px; line-height: 1.6; font-weight: 400; }
+
+        .auth-section {
+            background-color: var(--bg-panel);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem; 
+            position: relative;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 380px; 
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .view-wrapper {
+            width: 100%;
+            animation: fadeIn 0.4s ease-out;
+        }
+        
+        .hidden-view { display: none; }
+        .hidden { display: none; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .brand-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+            text-decoration: none;
+            align-self: flex-start;
+        }
+        .brand-logo { width: 44px; height: 44px; }
+        .brand-name { font-size: 3.5rem; font-weight: 700; font-family: "Roboto", sans-serif;}
+
+        .auth-title { font-size: 1.85rem; font-weight: 700; margin-bottom: 0.5rem; letter-spacing: -0.02em; }
+        .auth-subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem; line-height: 1.5; }
+
+        .input-group { position: relative; margin-bottom: 1.25rem; }
+        
+        .input-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            color: var(--text-muted);
+            pointer-events: none;
+            transition: color 0.2s;
+            z-index: 10;
+        }
+
+        .toggle-password {
+            pointer-events: auto;
+            cursor: pointer;
+            left: auto;
+            right: 18px;
+        }
+        .toggle-password:hover { color: var(--text-main); }
+
+        input {
+            width: 100%;
+            height: 100%;
+            padding: 14px 44px 14px 50px; 
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-input);
+            border-radius: var(--radius-input);
+            color: var(--text-main);
+            font-size: 0.95rem;
+            transition: var(--transition);
+            z-index: 1;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+            background-color: var(--bg-panel);
+        }
+        
+        input:focus + .input-icon, 
+        .input-group:focus-within .input-icon { color: var(--primary); }
+
+        /* --- Unified Custom Glass Dropdowns --- */
+        .custom-dropdown {
+            position: relative;
+            width: 100%;
+            user-select: none;
+        }
+        
+        .custom-dropdown.open { z-index: 10; }
+        
+        .dropdown-selected {
+            width: 100%;
+            height: 100%;
+            padding: 14px 16px;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-input);
+            border-radius: var(--radius-input);
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition);
+        }
+        
+        .dropdown-selected.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+            background-color: var(--bg-panel);
+        }
+        
+        .dropdown-arrow {
+            width: 16px;
+            height: 16px;
+            color: var(--text-muted);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-shrink: 0;
+        }
+        
+        .dropdown-selected.active .dropdown-arrow {
+            transform: rotate(180deg);
+            color: var(--primary);
+        }
+
+        .dropdown-options {
+            position: absolute;
+            top: calc(100% + 8px);
+            max-height: 250px;
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            overflow-x: hidden;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px) scale(0.98);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* SMART ANCHORING: Prevents content bleeding off-screen */
+        #gender-options {
+            left: 0;
+            width: 100%; 
+        }
+        #phone-code-options {
+            left: 0;
+            width: max-content;
+            min-width: 100%;
+            max-width: 280px; 
+        }
+        #country-options {
+            right: 0;
+            width: max-content;
+            min-width: 100%;
+            max-width: 280px;
+        }
+
+        html.dark .dropdown-options {
+            background-color: rgba(31, 41, 55, 0.85);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        .dropdown-options::-webkit-scrollbar { width: 6px; }
+        .dropdown-options::-webkit-scrollbar-track { background: transparent; margin: 8px 0; }
+        .dropdown-options::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+        html.dark .dropdown-options::-webkit-scrollbar-thumb { background: #4b5563; }
+
+        .custom-dropdown.open .dropdown-options {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        .dropdown-option {
+            padding: 12px 16px;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+        }
+
+        .dropdown-option:hover {
+            background-color: rgba(37, 99, 235, 0.1);
+            color: var(--primary);
+        }
+        
+        html.dark .dropdown-option:hover {
+            background-color: rgba(59, 130, 246, 0.15);
+        }
+
+        /* --- Headless Intl-Tel-Input Overrides --- */
+        .iti {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        .iti input[type=tel] {
+            padding-left: 16px !important;
+        }
+
+        .forgot-link {
+            display: block;
+            text-align: right;
+            font-size: 0.85rem;
+            color: var(--primary);
+            text-decoration: none;
+            margin-top: -0.25rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .back-link {
+            text-align: center;
+            display: block;
+            width: 100%;
+            margin-top: 1.5rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 600;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .back-link:hover { color: var(--text-main); text-decoration: underline; }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: var(--radius-btn);
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-primary:disabled { opacity: 0.7; cursor: not-allowed; }
+
+        .btn-google {
+            background-color: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            margin-top: 0;
+        }
+        .btn-google:hover { background-color: var(--bg-input); border-color: var(--text-muted); }
+
+        .separator {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 1.75rem 0;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+        }
+        .separator::before, .separator::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .separator span { padding: 0 15px; }
+
+        .toggle-mode {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        .toggle-mode button {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-weight: 700;
+            cursor: pointer;
+            margin-left: 4px;
+        }
+        .toggle-mode button:hover { text-decoration: underline; }
+
+        .theme-fab {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background-color: var(--bg-input);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-main);
+            transition: var(--transition);
+            border: none;
+            z-index: 10;
+        }
+        .theme-fab:hover { background-color: var(--border-color); }
+
+        #toast-container { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; width: max-content; }
+        .toast { background: var(--bg-panel); color: var(--text-main); padding: 12px 24px; border-radius: 50px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 12px; font-size: 0.9rem; font-weight: 500; opacity: 0; transform: translateY(-20px); transition: all 0.3s; border: 1px solid var(--border-color); }
+        .toast.visible { opacity: 1; transform: translateY(0); }
+        .toast.error svg { color: var(--error); }
+        .toast.success svg { color: var(--success); }
+        .spinner { width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: white; animation: spin 0.8s linear infinite; display: none; }
+        .btn-loading .spinner { display: block; }
+        .btn-loading span { display: none; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* --- LINK ACCOUNT BANNER --- */
+        .link-banner {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--primary);
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            animation: slideDownFade 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            position: relative;
+            box-shadow: 0 4px 15px -3px rgba(37, 99, 235, 0.08); 
+        }
+        .link-banner.hidden { display: none; }
+        
+        .link-banner-icon {
+            color: var(--primary);
+            background-color: rgba(37, 99, 235, 0.1); 
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        
+        .link-banner-content { flex: 1; }
+        
+        .link-banner-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 0.25rem;
+        }
+        
+        .link-banner-text {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+        
+        #link-target-email { color: var(--primary); font-weight: 600; }
+        
+        #close-banner-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px;
+            margin-top: 0;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        #close-banner-btn:hover { color: var(--text-main); background-color: var(--bg-input); }
+
+        @keyframes slideDownFade {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (min-width: 769px) {
+            .hero-section { display: flex; }
+            .theme-fab { top: 40px; right: 40px; }
+            .layout-container { grid-template-columns: 1fr 1fr; } 
+            .auth-section { padding: 4rem; }
+        }
+
+        @media (min-width: 1200px) {
+            .layout-container { grid-template-columns: 1fr 480px; }
+        }
+
+        @media (min-width: 1600px) {
+            .layout-container { grid-template-columns: 1fr 560px; }
+            .auth-container { max-width: 420px; }
+        }
+        
+        /* Hide native intl-tel-input flag/dial code container since we use a custom one */
+        .iti__flag-container { 
+            display: none !important; 
+        }
+        .iti input[type=tel] { 
+            padding-left: 16px !important; /* Overrides the plugin's automatic padding */
+        }
+        .input-icon {
+            /* Existing properties... */
+            transition: color 0.2s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        input:focus + .input-icon, 
+        .input-group:focus-within .input-icon { 
+            color: var(--primary); 
+            transform: translateY(-50%) scale(1.15); 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="layout-container">
+        
+        <div class="hero-section">
+            <div class="hero-overlay">
+                <div class="hero-text">
+                    <h2>Welcome to Qubit</h2>
+                    <p>Secure, fast, and reliable access with Qubit Single Sign-On</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="auth-section">
+            
+            <button id="themeToggle" class="theme-fab" aria-label="Toggle Theme">
+                <svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="display:none"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                <svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+            </button>
+
+            <div class="auth-container">
+                
+                <a href="https://gautam-anurag.github.io/qubit" class="brand-header">
+                    <span class="brand-name qubit-multicolor">Qubit</span>
+                </a>
+
+                <div id="link-account-banner" class="link-banner hidden">
+                    <div class="link-banner-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                        </svg>
+                    </div>
+                    <div class="link-banner-content">
+                        <div class="link-banner-title">Account Linking Required</div>
+                        <div class="link-banner-text">
+                            To connect your profiles, please sign in with the Google account for <span id="link-target-email">...</span>
+                        </div>
+                    </div>
+                    <button id="close-banner-btn" type="button" aria-label="Dismiss">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div id="auth-main-view" class="view-wrapper">
+                    <h1 class="auth-title" id="page-title">Sign In</h1>
+                    <p class="auth-subtitle" id="page-subtitle">Welcome back!</p>
+
+                    <form id="login-form">
+                        <div class="input-group">
+                            <input type="email" id="email" placeholder="Email Address" required autocomplete="email">
+                            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                            </svg>
+                        </div>
+
+                        <div class="input-group">
+                            <input type="password" id="password" placeholder="Password" required autocomplete="current-password">
+                            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 00-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                            </svg>
+                            <svg id="toggle-password" class="input-icon toggle-password" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </div>
+
+                        <div id="confirm-password-container" class="input-group hidden">
+                            <input type="password" id="confirm-password" placeholder="Confirm Password" autocomplete="new-password">
+                            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 00-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                            </svg>
+                            <svg id="toggle-confirm-password" class="input-icon toggle-password" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </div>
+
+                        <a id="forgot-password-link" class="forgot-link">Forgot Password?</a>
+
+                        <button type="submit" id="submitBtn" class="btn btn-primary">
+                            <div class="spinner"></div>
+                            <span id="btn-text">Sign In</span>
+                        </button>
+                    </form>
+
+                    <div class="separator"><span>OR</span></div>
+
+                    <button type="button" id="googleLoginBtn" class="btn btn-google">
+                        <svg viewBox="0 0 24 24" width="22" height="22" xmlns="http://www.w3.org/2000/svg">
+                            <g transform="matrix(1, 0, 0, 1, 0, 0)">
+                                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+                                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+                                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
+                                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+                            </g>
+                        </svg>
+                        <span>Continue with Google</span>
+                    </button>
+
+                    <div class="toggle-mode">
+                        <span id="toggle-text">Don't have an account?</span>
+                        <button id="toggleModeBtn">Sign Up</button>
+                    </div>
+                </div>
+
+                <div id="auth-forgot-view" class="view-wrapper hidden-view">
+                    <h1 class="auth-title">Reset Password</h1>
+                    <p class="auth-subtitle">Enter your email and we'll send a reset link to get back into your account.</p>
+
+                    <form id="reset-form">
+                        <div class="input-group">
+                            <input type="email" id="reset-email" placeholder="Email Address" required>
+                            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                            </svg>
+                        </div>
+
+                        <button type="submit" id="sendResetBtn" class="btn btn-primary">
+                            <div class="spinner"></div>
+                            <span id="reset-btn-text">Send Reset Link</span>
+                        </button>
+                    </form>
+
+                    <button id="backToLoginBtn" class="back-link">Back to Sign In</button>
+                </div>
+
+                <div id="auth-password-setup-view" class="view-wrapper hidden-view">
+                    <h1 class="auth-title">Secure Account</h1>
+                    <p class="auth-subtitle">Set a password to access your account via email/password in the future.</p>
+                    
+                    <div class="input-group">
+                        <input type="password" id="new-password" placeholder="Create Password" required>
+                        <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 00-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                        </svg>
+                        <svg id="toggle-new-pass" class="input-icon toggle-password" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </div>
+
+                    <div class="input-group">
+                        <input type="password" id="confirm-new-password" placeholder="Confirm Password" required>
+                        <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 00-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                        </svg>
+                        <svg id="toggle-confirm-new-pass" class="input-icon toggle-password" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </div>
+
+                    <button id="savePasswordBtn" class="btn btn-primary" style="margin-bottom: 0.5rem;">Save Password</button>
+                    <button id="skipPasswordBtn" class="back-link">Skip for Now</button>
+                </div>
+                
+                <div id="auth-onboarding-view" class="view-wrapper hidden-view">
+                    <h1 class="auth-title" id="onboarding-title">Complete Profile</h1>
+                    <p class="auth-subtitle" id="onboarding-subtitle">Just a few details to create your account.</p>
+
+                    <form id="onboarding-form">
+                        <div class="input-group">
+                            <input type="text" id="profile-name" placeholder="Full Name" required autocomplete="name">
+                            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+                        </div>
+
+                        <div class="input-group">
+                            <input type="email" id="profile-email" placeholder="Email Address" disabled style="opacity: 0.6; cursor: not-allowed;">
+                            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /></svg>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 120px 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+                            
+                            <div class="custom-dropdown" id="phone-code-dropdown-container">
+                                <div class="dropdown-selected" id="phone-code-selected">
+                                    <span id="phone-code-display" style="color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+                                        </span>
+                                    <svg class="dropdown-arrow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                                    </svg>
+                                </div>
+                                <div class="dropdown-options" id="phone-code-options">
+                                    </div>
+                            </div>
+                            
+                            <div class="input-group" style="margin-bottom: 0;">
+                                <input type="tel" id="profile-phone" placeholder="Phone Number" required autocomplete="tel-national">
+                            </div>
+                            
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+                            
+                            <div class="custom-dropdown" id="gender-dropdown-container">
+                                <div class="dropdown-selected" id="gender-selected">
+                                    <span id="gender-display" style="color: var(--text-muted);">Gender</span>
+                                    <svg class="dropdown-arrow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                                    </svg>
+                                </div>
+                                <div class="dropdown-options" id="gender-options">
+                                    <div class="dropdown-option" data-value="male">Male</div>
+                                    <div class="dropdown-option" data-value="female">Female</div>
+                                    <div class="dropdown-option" data-value="non-binary">Non-binary</div>
+                                    <div class="dropdown-option" data-value="other">Other</div>
+                                    <div class="dropdown-option" data-value="prefer-not-to-say">Prefer not to say</div>
+                                </div>
+                                <input type="hidden" id="profile-gender">
+                            </div>
+
+                            <div class="custom-dropdown" id="country-dropdown-container">
+                                <div class="dropdown-selected" id="country-selected">
+                                    <span id="country-display" style="color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
+                                        Country
+                                    </span>
+                                    <svg class="dropdown-arrow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                                    </svg>
+                                </div>
+                                <div class="dropdown-options" id="country-options">
+                                    </div>
+                                <input type="hidden" id="profile-country">
+                            </div>
+
+                        </div>
+
+                        <button type="submit" id="completeProfileBtn" class="btn btn-primary">
+                            <div class="spinner"></div>
+                            <span id="complete-btn-text">Save & Continue</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            signInWithEmailAndPassword, 
+            createUserWithEmailAndPassword, 
+            signInWithPopup, 
+            GoogleAuthProvider, 
+            onAuthStateChanged,
+            updatePassword,
+            sendPasswordResetEmail
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            getDoc, 
+            setDoc, 
+            serverTimestamp 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDdavvZjFC1xo3reedoJyecBJCFXyo7vIM",
+            authDomain: "my-qubit.firebaseapp.com",
+            projectId: "my-qubit",
+            storageBucket: "my-qubit.firebasestorage.app",
+            messagingSenderId: "68819998084",
+            appId: "1:68819998084:web:02ff7dd40e78659ea1f9d1",
+            measurementId: "G-0Q405ENYN6"
+        };
+
+        const analytics = getAnalytics(app);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const googleProvider = new GoogleAuthProvider();
+        const APP_ID = '';
+
+        const dom = {
+            mainView: document.getElementById('auth-main-view'),
+            forgotView: document.getElementById('auth-forgot-view'),
+            passwordSetupView: document.getElementById('auth-password-setup-view'),
+            
+            onboardingView: document.getElementById('auth-onboarding-view'),
+            onboardingForm: document.getElementById('onboarding-form'),
+            profileName: document.getElementById('profile-name'),
+            profileEmail: document.getElementById('profile-email'),
+            profilePhone: document.getElementById('profile-phone'),
+            
+            profileCountry: document.getElementById('profile-country'),
+            profileGender: document.getElementById('profile-gender'),
+            
+            completeProfileBtn: document.getElementById('completeProfileBtn'),
+            
+            loginForm: document.getElementById('login-form'),
+            resetForm: document.getElementById('reset-form'),
+            
+            emailInput: document.getElementById('email'),
+            passwordInput: document.getElementById('password'),
+            confirmPasswordInput: document.getElementById('confirm-password'),
+            confirmPasswordContainer: document.getElementById('confirm-password-container'),
+            resetEmailInput: document.getElementById('reset-email'),
+            
+            submitBtn: document.getElementById('submitBtn'),
+            btnText: document.getElementById('btn-text'),
+            googleBtn: document.getElementById('googleLoginBtn'),
+            toggleModeBtn: document.getElementById('toggleModeBtn'),
+            sendResetBtn: document.getElementById('sendResetBtn'),
+            backToLoginBtn: document.getElementById('backToLoginBtn'),
+            
+            toggleText: document.getElementById('toggle-text'),
+            pageTitle: document.getElementById('page-title'),
+            pageSubtitle: document.getElementById('page-subtitle'),
+            
+            togglePassword: document.getElementById('toggle-password'),
+            toggleConfirmPassword: document.getElementById('toggle-confirm-password'),
+            
+            newPasswordInput: document.getElementById('new-password'),
+            confirmNewPasswordInput: document.getElementById('confirm-new-password'),
+            toggleNewPass: document.getElementById('toggle-new-pass'),
+            toggleConfirmNewPass: document.getElementById('toggle-confirm-new-pass'),
+            savePasswordBtn: document.getElementById('savePasswordBtn'),
+            skipPasswordBtn: document.getElementById('skipPasswordBtn'),
+            
+            forgotLink: document.getElementById('forgot-password-link'),
+            themeToggle: document.getElementById('themeToggle'),
+            iconSun: document.getElementById('icon-sun'),
+            iconMoon: document.getElementById('icon-moon'),
+
+            linkBanner: document.getElementById('link-account-banner'),
+            linkTargetEmail: document.getElementById('link-target-email'),
+            closeBannerBtn: document.getElementById('close-banner-btn'),
+            separator: document.querySelector('.separator'),
+            toggleMode: document.querySelector('.toggle-mode'),
+
+            onboardingTitle: document.getElementById('onboarding-title'),
+            onboardingSubtitle: document.getElementById('onboarding-subtitle')
+        };
+
+        let isRegisterMode = false;
+
+        // --- Custom Dropdown Containers ---
+        const genderDropdownContainer = document.getElementById('gender-dropdown-container');
+        const genderSelected = document.getElementById('gender-selected');
+        const genderOptions = document.getElementById('gender-options');
+        const genderDisplay = document.getElementById('gender-display');
+
+        const countryDropdownContainer = document.getElementById('country-dropdown-container');
+        const countrySelected = document.getElementById('country-selected');
+        const countryOptions = document.getElementById('country-options');
+        const countryDisplay = document.getElementById('country-display');
+        
+        const phoneCodeDropdownContainer = document.getElementById('phone-code-dropdown-container');
+        const phoneCodeSelected = document.getElementById('phone-code-selected');
+        const phoneCodeOptions = document.getElementById('phone-code-options');
+        const phoneCodeDisplay = document.getElementById('phone-code-display');
+
+        // --- Headless Phone Initialization ---
+        const iti = window.intlTelInput(dom.profilePhone, {
+            initialCountry: "auto",
+            geoIpLookup: callback => {
+                fetch("https://ipapi.co/json")
+                    .then(res => res.json())
+                    .then(data => callback(data.country_code))
+                    .catch(() => callback("in")); // Defaulted to 'in' as a reliable fallback
+            },
+            utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.5/build/js/utils.js",
+            showFlags: false,         
+            allowDropdown: false,     
+            separateDialCode: true,   // Forces the plugin to strip the dial code from the input
+            strictMode: true,         // Blocks typing invalid characters for the selected country
+            formatOnDisplay: true
+        });
+
+        // --- Smart Sync: Update Custom Dropdown if ITI detects a pasted country code ---
+        dom.profilePhone.addEventListener("countrychange", () => {
+            const currentCountry = iti.getSelectedCountryData();
+            if (currentCountry && currentCountry.iso2) {
+                const flagUrl = `https://flagcdn.com/w20/${currentCountry.iso2.toLowerCase()}.png`;
+                phoneCodeDisplay.innerHTML = `<img src="${flagUrl}" width="20" style="border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.15);" alt="${currentCountry.iso2}"> <span style="color: var(--text-main); display: flex; align-items: center; gap: 8px;">+${currentCountry.dialCode}</span>`;
+            }
+        });
+
+        // Dynamic Dropdown Population
+        document.addEventListener("DOMContentLoaded", () => {
+            const allCountries = window.intlTelInputGlobals.getCountryData();
+            
+            allCountries.forEach(country => {
+                const iso2 = country.iso2.toLowerCase();
+                const flagUrl = `https://flagcdn.com/w20/${iso2}.png`;
+                const flagImg = `<img src="${flagUrl}" width="20" style="border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.15); flex-shrink: 0;" alt="${country.iso2}">`;
+                
+                // 1. Build Custom Phone Code Option
+                const pOption = document.createElement('div');
+                pOption.className = 'dropdown-option';
+                pOption.style.display = 'flex';
+                pOption.style.alignItems = 'center';
+                pOption.style.gap = '10px';
+                pOption.innerHTML = `${flagImg} <span style="white-space: nowrap;">${country.name} (+${country.dialCode})</span>`;
+                
+                pOption.addEventListener('click', () => {
+                    phoneCodeDisplay.innerHTML = `${flagImg} <span>+${country.dialCode}</span>`;
+                    iti.setCountry(country.iso2); 
+                    phoneCodeDropdownContainer.classList.remove('open');
+                    phoneCodeSelected.classList.remove('active');
+                    dom.profilePhone.focus();
+                });
+                phoneCodeOptions.appendChild(pOption);
+
+                // 2. Build Custom Residence Option
+                const rOption = document.createElement('div');
+                rOption.className = 'dropdown-option';
+                rOption.setAttribute('data-value', country.iso2.toUpperCase());
+                rOption.style.display = 'flex';
+                rOption.style.alignItems = 'center';
+                rOption.style.gap = '10px';
+                rOption.innerHTML = `${flagImg} <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${country.name}</span>`;
+                
+                rOption.addEventListener('click', () => {
+                    countryDisplay.innerHTML = `${flagImg} <span style="color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${country.name}</span>`;
+                    dom.profileCountry.value = country.iso2.toUpperCase();
+                    countryDropdownContainer.classList.remove('open');
+                    countrySelected.classList.remove('active');
+                });
+                countryOptions.appendChild(rOption);
+            });
+        });
+
+        iti.promise.then(() => {
+            const currentCountry = iti.getSelectedCountryData();
+            if (currentCountry && currentCountry.iso2) {
+                const iso2 = currentCountry.iso2.toLowerCase();
+                const flagUrl = `https://flagcdn.com/w20/${iso2}.png`;
+                phoneCodeDisplay.innerHTML = `<img src="${flagUrl}" width="20" style="border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.15);" alt="${currentCountry.iso2}"> <span>+${currentCountry.dialCode}</span>`;
+            }
+        });
+
+        // --- Dropdown Toggles ---
+        function closeAllDropdowns() {
+            genderDropdownContainer.classList.remove('open');
+            genderSelected.classList.remove('active');
+            countryDropdownContainer.classList.remove('open');
+            countrySelected.classList.remove('active');
+            phoneCodeDropdownContainer.classList.remove('open');
+            phoneCodeSelected.classList.remove('active');
+        }
+
+        genderSelected.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = genderDropdownContainer.classList.contains('open');
+            closeAllDropdowns();
+            if (!isOpen) {
+                genderDropdownContainer.classList.add('open');
+                genderSelected.classList.add('active');
+            }
+        });
+
+        countrySelected.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = countryDropdownContainer.classList.contains('open');
+            closeAllDropdowns();
+            if (!isOpen) {
+                countryDropdownContainer.classList.add('open');
+                countrySelected.classList.add('active');
+            }
+        });
+        
+        phoneCodeSelected.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = phoneCodeDropdownContainer.classList.contains('open');
+            closeAllDropdowns();
+            if (!isOpen) {
+                phoneCodeDropdownContainer.classList.add('open');
+                phoneCodeSelected.classList.add('active');
+            }
+        });
+
+        genderOptions.querySelectorAll('.dropdown-option').forEach(option => {
+            option.addEventListener('click', () => {
+                const value = option.getAttribute('data-value');
+                const text = option.textContent;
+                
+                genderDisplay.textContent = text;
+                genderDisplay.style.color = 'var(--text-main)'; 
+                dom.profileGender.value = value;
+                
+                closeAllDropdowns();
+            });
+        });
+
+        document.addEventListener('click', closeAllDropdowns);
+
+        function getRedirectUrl() {
+            const params = new URLSearchParams(window.location.search);
+            
+            // 1. Check for predefined app routing
+            const appTarget = params.get('app');
+            const appRoutes = {
+                'qubit': 'https://gautam-anurag.io/qubit',
+                'account-center': 'https://gautam-anurag.github.io/qubit/dashboard/page?view=account-center',
+                'apps': 'https://gautam-anurag.github.io/qubit/apps'
+            };
+
+            if (appTarget && appRoutes[appTarget]) {
+                return appRoutes[appTarget];
+            }
+
+            // 2. Fallback to explicit redirectUrl parameter (Safe Base Checking)
+            const redirectUrl = params.get('redirectUrl');
+            const allowedBase = 'https://gautam-anurag.github.io/';
+
+            if (redirectUrl && redirectUrl.startsWith(allowedBase)) {
+                return redirectUrl;
+            }
+            
+            // 3. Default fallback if no specific routing is provided
+            return 'https://gautam-anurag.github.io/qubit/dashboard/page?view=dashboard';
+        }
+        const mainAppUrl = getRedirectUrl();
+
+        function checkInitialFlows() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const flow = urlParams.get('flow');
+            const linkEmail = urlParams.get('link_email');
+
+            if (flow === 'link' && linkEmail) {
+                dom.linkBanner.classList.remove('hidden');
+                dom.linkTargetEmail.textContent = linkEmail;
+                dom.loginForm.style.display = 'none';
+                if(dom.separator) dom.separator.style.display = 'none';
+                if(dom.toggleMode) dom.toggleMode.style.display = 'none';
+                if(dom.emailInput) dom.emailInput.value = linkEmail;
+                dom.pageTitle.textContent = "Link Google Account";
+                dom.pageSubtitle.textContent = "Sign in to connect your profiles.";
+            } else if (flow === 'editprofile') {
+                // Dynamically update the Login view headings BEFORE authentication
+                dom.pageTitle.textContent = "Verify Identity";
+                dom.pageSubtitle.textContent = "Please sign in securely to edit your profile.";
+                
+                // Hide the "Sign Up" toggle since they are trying to edit an existing account
+                if(dom.toggleMode) dom.toggleMode.style.display = 'none';
+            }
+        }
+        checkInitialFlows();
+
+        dom.closeBannerBtn.addEventListener('click', () => {
+            dom.linkBanner.classList.add('hidden');
+            dom.loginForm.style.display = 'block';
+            if(dom.separator) dom.separator.style.display = 'flex';
+            if(dom.toggleMode) dom.toggleMode.style.display = 'block';
+            dom.pageTitle.textContent = "Sign In"; 
+            dom.pageSubtitle.textContent = "Welcome back!";
+        });
+
+        function showToast(message, type = 'error') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const iconHtml = type === 'error' ? 
+                `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>` : 
+                `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`;
+            
+            toast.innerHTML = iconHtml;
+            const textSpan = document.createElement('span');
+            textSpan.textContent = message;
+            toast.appendChild(textSpan);
+
+            container.appendChild(toast);
+            requestAnimationFrame(() => toast.classList.add('visible'));
+            setTimeout(() => { toast.classList.remove('visible'); setTimeout(() => toast.remove(), 300); }, 3000);
+        }
+
+        function setLoading(btn, isLoading, defaultText) {
+            if (isLoading) {
+                btn.classList.add('btn-loading');
+                btn.disabled = true;
+            } else {
+                btn.classList.remove('btn-loading');
+                btn.disabled = false;
+                const span = btn.querySelector('span');
+                if (span) span.textContent = defaultText;
+                else btn.textContent = defaultText;
+            }
+        }
+
+        function switchView(viewName) {
+            dom.mainView.classList.add('hidden-view');
+            dom.forgotView.classList.add('hidden-view');
+            dom.passwordSetupView.classList.add('hidden-view');
+            dom.onboardingView.classList.add('hidden-view');
+
+            if (viewName === 'forgot') {
+                dom.forgotView.classList.remove('hidden-view');
+                if(dom.emailInput.value) dom.resetEmailInput.value = dom.emailInput.value;
+            } else if (viewName === 'password-setup') {
+                dom.passwordSetupView.classList.remove('hidden-view');
+            } else if (viewName === 'onboarding') {
+                dom.onboardingView.classList.remove('hidden-view');
+            } else {
+                dom.mainView.classList.remove('hidden-view');
+            }
+        }
+
+        dom.forgotLink.addEventListener('click', (e) => { e.preventDefault(); switchView('forgot'); });
+        dom.backToLoginBtn.addEventListener('click', (e) => { e.preventDefault(); switchView('login'); });
+
+        // --- ADDED UNIFIED ROUTING LOGIC ---
+        async function handlePostAuthRouting(user) {
+            try {
+                const userRef = doc(db, 'artifacts', APP_ID, 'users', user.uid);
+                const userSnap = await getDoc(userRef);
+                
+                const urlParams = new URLSearchParams(window.location.search);
+                const flow = urlParams.get('flow');
+                const isEditFlow = flow === 'editprofile';
+
+                if (userSnap.exists()) {
+                    const userData = userSnap.data();
+
+                    if (isEditFlow) {
+                        dom.profileName.value = userData.name || user.displayName || '';
+                        dom.profileEmail.value = userData.email || user.email || '';
+                        
+                        if (userData.gender) {
+                            dom.profileGender.value = userData.gender;
+                            const option = document.querySelector(`.dropdown-option[data-value="${userData.gender}"]`);
+                            if (option) {
+                                genderDisplay.textContent = option.textContent;
+                                genderDisplay.style.color = 'var(--text-main)';
+                            }
+                        }
+
+                        if (userData.country) {
+                            dom.profileCountry.value = userData.country;
+                            const countryData = window.intlTelInputGlobals.getCountryData().find(c => c.iso2.toUpperCase() === userData.country);
+                            if (countryData) {
+                                const flagUrl = `https://flagcdn.com/w20/${countryData.iso2.toLowerCase()}.png`;
+                                countryDisplay.innerHTML = `<img src="${flagUrl}" width="20" style="border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.15); flex-shrink: 0;" alt="${countryData.iso2}"> <span style="color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${countryData.name}</span>`;
+                            }
+                        }
+
+                        if (userData.phone) {
+                            iti.setNumber(userData.phone);
+                            const currentCountry = iti.getSelectedCountryData();
+                            if (currentCountry && currentCountry.iso2) {
+                                const flagUrl = `https://flagcdn.com/w20/${currentCountry.iso2.toLowerCase()}.png`;
+                                phoneCodeDisplay.innerHTML = `<img src="${flagUrl}" width="20" style="border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.15);" alt="${currentCountry.iso2}"> <span>+${currentCountry.dialCode}</span>`;
+                            }
+                        }
+
+                        document.getElementById('complete-btn-text').textContent = "Update Profile";
+                        dom.onboardingTitle.textContent = "Edit Profile";
+                        dom.onboardingSubtitle.textContent = "Update your account details below.";
+                        
+                        switchView('onboarding');
+                    } else if (userData.onboardingComplete) {
+                        window.location.href = mainAppUrl;
+                    } else {
+                        dom.profileName.value = user.displayName || '';
+                        dom.profileEmail.value = user.email || '';
+                        switchView('onboarding');
+                    }
+                } else {
+                    dom.profileName.value = user.displayName || '';
+                    dom.profileEmail.value = user.email || '';
+                    switchView('onboarding');
+                }
+            } catch (error) {
+                console.error("Error routing user:", error);
+                showToast("Failed to verify profile status.");
+            }
+        }
+
+        // --- UPDATED AUTH LISTENER ---
+        onAuthStateChanged(auth, async (user) => {
+            if (sessionStorage.getItem('pendingGoogleAuth')) return;
+            if (user) {
+                await handlePostAuthRouting(user);
+            }
+        });
+
+        function setupToggle(icon, input) {
+            icon.addEventListener('click', () => {
+                const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                input.setAttribute('type', type);
+                icon.style.color = type === 'text' ? 'var(--primary)' : 'var(--text-muted)';
+            });
+        }
+        setupToggle(dom.togglePassword, dom.passwordInput);
+        setupToggle(dom.toggleConfirmPassword, dom.confirmPasswordInput);
+        setupToggle(dom.toggleNewPass, dom.newPasswordInput);
+        setupToggle(dom.toggleConfirmNewPass, dom.confirmNewPasswordInput);
+
+        function triggerRateLimit(btn, originalText) {
+             const originalColor = btn.style.backgroundColor;
+             btn.disabled = true;
+             btn.style.opacity = '0.5';
+             btn.style.cursor = 'not-allowed';
+             
+             setTimeout(() => {
+                 btn.disabled = false;
+                 btn.style.opacity = '1';
+                 btn.style.cursor = 'pointer';
+                 if (btn.querySelector('.spinner')) {
+                     setLoading(btn, false, originalText);
+                 }
+             }, 3000);
+        }
+
+        dom.loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = dom.emailInput.value;
+            const password = dom.passwordInput.value;
+            
+            if (!email || !password) return showToast('Please fill in all fields');
+
+            if (isRegisterMode) {
+                const confirmPassword = dom.confirmPasswordInput.value;
+                if (password !== confirmPassword) return showToast('Passwords do not match');
+            }
+
+            setLoading(dom.submitBtn, true);
+            try {
+                if (isRegisterMode) {
+                    await createUserWithEmailAndPassword(auth, email, password);
+                } else {
+                    await signInWithEmailAndPassword(auth, email, password);
+                }
+            } catch (error) {
+                triggerRateLimit(dom.submitBtn, isRegisterMode ? 'Sign Up' : 'Sign In');
+                handleAuthError(error);
+            }
+        });
+
+        dom.resetForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = dom.resetEmailInput.value;
+            if (!email) return showToast('Please enter your email address');
+            setLoading(dom.sendResetBtn, true);
+            try {
+                await sendPasswordResetEmail(auth, email);
+                showToast('Reset link sent to your email!', 'success');
+                setTimeout(() => switchView('login'), 2000);
+            } catch (error) {
+                triggerRateLimit(dom.sendResetBtn, 'Send Reset Link');
+                handleAuthError(error);
+            } finally {
+                if (!dom.sendResetBtn.disabled) setLoading(dom.sendResetBtn, false, 'Send Reset Link');
+            }
+        });
+
+        // --- UPDATED GOOGLE BUTTON ---
+        dom.googleBtn.addEventListener('click', async () => {
+            sessionStorage.setItem('pendingGoogleAuth', 'true');
+            try {
+                const result = await signInWithPopup(auth, googleProvider);
+                if (!result.user.providerData.some(p => p.providerId === 'password')) {
+                    switchView('password-setup');
+                } else {
+                    sessionStorage.removeItem('pendingGoogleAuth');
+                    await handlePostAuthRouting(result.user);
+                }
+            } catch (error) {
+                sessionStorage.removeItem('pendingGoogleAuth');
+                handleAuthError(error);
+            }
+        });
+
+        dom.toggleModeBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            isRegisterMode = !isRegisterMode;
+            dom.emailInput.value = ''; 
+            dom.passwordInput.value = '';
+            dom.confirmPasswordInput.value = '';
+
+            if (isRegisterMode) {
+                dom.pageTitle.textContent = "Create Account";
+                dom.pageSubtitle.textContent = "Get started with your new account.";
+                dom.btnText.textContent = "Sign Up";
+                dom.toggleText.textContent = "Already have an account?";
+                dom.toggleModeBtn.textContent = "Sign In";
+                dom.forgotLink.style.display = 'none';
+                dom.confirmPasswordContainer.classList.remove('hidden');
+            } else {
+                dom.pageTitle.textContent = "Sign In";
+                dom.pageSubtitle.textContent = "Welcome back!";
+                dom.btnText.textContent = "Sign In";
+                dom.toggleText.textContent = "Don't have an account?";
+                dom.toggleModeBtn.textContent = "Sign Up";
+                dom.forgotLink.style.display = 'block';
+                dom.confirmPasswordContainer.classList.add('hidden');
+            }
+        });
+
+        // --- UPDATED SAVE PASSWORD BUTTON ---
+        dom.savePasswordBtn.addEventListener('click', async () => {
+            const newPass = dom.newPasswordInput.value;
+            const confirmPass = dom.confirmNewPasswordInput.value;
+            
+            if (newPass.length < 6) return showToast('Password must be at least 6 characters');
+            if (newPass !== confirmPass) return showToast('Passwords do not match');
+
+            const originalText = dom.savePasswordBtn.textContent;
+            dom.savePasswordBtn.textContent = 'Saving...';
+            dom.savePasswordBtn.disabled = true;
+
+            try {
+                await updatePassword(auth.currentUser, newPass);
+                sessionStorage.removeItem('pendingGoogleAuth');
+                await handlePostAuthRouting(auth.currentUser);
+            } catch (error) {
+                dom.savePasswordBtn.textContent = originalText;
+                dom.savePasswordBtn.disabled = false;
+                showToast(error.message);
+            }
+        });
+        
+        // --- UPDATED SKIP PASSWORD BUTTON ---
+        dom.skipPasswordBtn.addEventListener('click', async () => {
+            sessionStorage.removeItem('pendingGoogleAuth');
+            await handlePostAuthRouting(auth.currentUser);
+        });
+
+        // --- UPDATED ONBOARDING FORM ---
+        dom.onboardingForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const user = auth.currentUser;
+            if (!user) return;
+
+            if (!iti.isValidNumber()) {
+                return showToast('Please enter a valid phone number for the selected country.');
+            }
+            if (!dom.profileGender.value) {
+                return showToast('Please select your gender.');
+            }
+            if (!dom.profileCountry.value) {
+                return showToast('Please select your country of residence.');
+            }
+
+            setLoading(dom.completeProfileBtn, true);
+
+            try {
+                const userRef = doc(db, 'artifacts', APP_ID, 'users', user.uid);
+                const universalPhoneNumber = iti.getNumber();
+                
+                const urlParams = new URLSearchParams(window.location.search);
+                const isEditFlow = urlParams.get('flow') === 'editprofile';
+
+                // 1. Build the base payload for fields that should ALWAYS update
+                const payload = {
+                    name: dom.profileName.value,
+                    email: dom.profileEmail.value,
+                    phone: universalPhoneNumber,
+                    country: dom.profileCountry.value,
+                    gender: dom.profileGender.value,
+                    onboardingComplete: true,
+                    lastLogin: serverTimestamp()
+                };
+
+                // 2. Only add destructive fields if it is a NEW setup (not an edit flow)
+                if (!isEditFlow) {
+                    payload.photoURL = user.photoURL || '';
+                    payload.provider = user.providerData[0]?.providerId || 'email';
+                    payload.createdAt = serverTimestamp();
+                }
+
+                // 3. Save to Firestore
+                await setDoc(userRef, payload, { merge: true });
+
+                const successMsg = isEditFlow ? 'Profile updated successfully!' : 'Profile setup complete!';
+                
+                showToast(successMsg, 'success');
+                
+                setTimeout(() => {
+                    window.location.href = mainAppUrl;
+                }, 800);
+
+            } catch (error) {
+                setLoading(dom.completeProfileBtn, false, 'Save & Continue');
+                showToast(error.message);
+            }
+        });
+
+        dom.themeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateThemeIcon(isDark);
+        });
+
+        function updateThemeIcon(isDark) {
+            dom.iconSun.style.display = isDark ? 'block' : 'none';
+            dom.iconMoon.style.display = isDark ? 'none' : 'block';
+            document.getElementById('theme-color-meta').setAttribute('content', isDark ? '#000000' : '#ffffff');
+        }
+        updateThemeIcon(document.documentElement.classList.contains('dark'));
+
+        function handleAuthError(error) {
+            const errorCode = error.code || error.message;
+            
+            const errorMap = {
+                'auth/invalid-email': 'Please enter a valid email address.',
+                'auth/user-not-found': 'Incorrect email or password.',
+                'auth/wrong-password': 'Incorrect email or password.',
+                'auth/invalid-credential': 'Incorrect email or password.',
+                'auth/email-already-in-use': 'This email is already linked to an account.',
+                'auth/weak-password': 'Password is too weak. Use at least 6 characters.',
+                'auth/too-many-requests': 'Too many attempts. Please try again later.',
+                'auth/network-request-failed': 'Network error. Check your connection.'
+            };
+
+            // Fallback to the raw Firebase message if it's not in our map
+            const msg = errorMap[errorCode] || error.message.replace('Firebase:', '').trim();
+            showToast(msg, 'error');
+        }
+    </script>
+</body>
+</html>

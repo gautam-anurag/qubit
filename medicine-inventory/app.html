@@ -364,22 +364,30 @@
 
                 let rawSuggestions = [];
 
+                // --- NEW: Safe Parser to prevent FDA API crashes ---
+                const safeParse = (field) => {
+                    if (!field) return '';
+                    return Array.isArray(field) ? field.join(' ') : String(field);
+                };
+
+                // 1. Process FDA Data (Rich structural mapping for Salts)
                 if (fdaRes.status === 'fulfilled' && fdaRes.value.ok) {
                     const fdaData = await fdaRes.value.json();
                     if (fdaData.results) {
                         fdaData.results.forEach(drug => {
                             if (drug.brand_name) {
                                 rawSuggestions.push({
-                                    brand: drug.brand_name.toLowerCase(),
-                                    salt: drug.generic_name ? drug.generic_name.toLowerCase() : '',
-                                    mfg: drug.labeler_name ? drug.labeler_name : '',
-                                    typeStr: drug.dosage_form ? drug.dosage_form.join(' ') : ''
+                                    brand: safeParse(drug.brand_name).toLowerCase(),
+                                    salt: safeParse(drug.generic_name).toLowerCase(),
+                                    mfg: safeParse(drug.labeler_name),
+                                    typeStr: safeParse(drug.dosage_form)
                                 });
                             }
                         });
                     }
                 }
 
+                // 2. Process NIH Data (Broad fallback mapping)
                 if (nihRes.status === 'fulfilled' && nihRes.value.ok) {
                     const nihData = await nihRes.value.json();
                     const names = nihData[1];
@@ -390,6 +398,7 @@
                     }
                 }
 
+                // 3. Deduplicate
                 const uniqueSuggestions = [];
                 const seenBrands = new Set();
                 
@@ -407,6 +416,7 @@
                     return;
                 }
 
+                // 4. Render Results
                 autocompleteResults.innerHTML = '';
                 uniqueSuggestions.forEach(item => {
                     const div = document.createElement('div');
@@ -426,8 +436,11 @@
                     
                     div.onclick = () => {
                         medBrandInput.value = item.brand.replace(/\b\w/g, c => c.toUpperCase());
+                        
+                        // Smart Salt Fallback
                         const finalSalt = item.salt || item.brand;
                         medSaltsInput.value = finalSalt.replace(/\b\w/g, c => c.toUpperCase());
+                        
                         if(item.mfg) medMfgInput.value = item.mfg;
                         
                         const targetRadio = document.querySelector(`input[value="${item.mappedType}"]`);
@@ -439,6 +452,7 @@
                 });
                 autocompleteResults.classList.remove('hidden');
             } catch (error) {
+                console.error("Autocomplete failure:", error);
                 autocompleteResults.classList.add('hidden');
             }
         }

@@ -54,7 +54,7 @@
 
         /* --- Layout Grid --- */
         .dashboard-layout { display: grid; grid-template-columns: 1fr; gap: 2rem; }
-        @media (min-width: 768px) { .dashboard-layout { grid-template-columns: 350px 1fr; } }
+        @media (min-width: 850px) { .dashboard-layout { grid-template-columns: 360px 1fr; } }
 
         /* --- Forms & Panels --- */
         .panel { background-color: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; }
@@ -110,11 +110,34 @@
         }
         .btn-primary:hover { background-color: var(--primary-hover); }
 
+        /* --- Inventory Header & Search --- */
+        .inventory-header {
+            display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem;
+        }
+        @media(min-width: 640px) {
+            .inventory-header { flex-direction: row; justify-content: space-between; align-items: flex-end; }
+        }
+        .search-box {
+            position: relative; width: 100%; max-width: 350px;
+        }
+        .search-box input {
+            width: 100%; padding: 0.6rem 1rem 0.6rem 2.5rem; background-color: var(--bg-card);
+            border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main);
+            font-size: 0.9rem; transition: border-color 0.2s;
+        }
+        .search-box input:focus { outline: none; border-color: var(--primary); }
+        .search-box svg {
+            position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+            color: var(--text-muted); pointer-events: none;
+        }
+
         /* --- Medicine Grid & Cards --- */
         .medicine-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem; }
+        
         .med-card {
             background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px;
             padding: 1.25rem; display: flex; flex-direction: column; position: relative; transition: transform 0.2s;
+            border-left: 4px solid var(--border-color); /* Status Indicator Default */
         }
         .med-card:hover { border-color: #333333; }
 
@@ -137,6 +160,7 @@
         .badge { font-size: 0.75rem; font-weight: 600; padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid transparent; }
         .badge.danger { background-color: var(--danger-bg); color: var(--danger); border-color: var(--danger); }
         .badge.warning { background-color: var(--warning-bg); color: var(--warning); border-color: var(--warning); }
+        .badge.success { background-color: rgba(16, 185, 129, 0.1); color: var(--success); border-color: var(--success); }
 
         .qty-controls {
             display: flex; align-items: center; justify-content: space-between;
@@ -250,6 +274,17 @@
             </aside>
 
             <main>
+                <div class="inventory-header">
+                    <div>
+                        <h2 class="panel-title" style="margin-bottom: 0;">Available Stock</h2>
+                        <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;" id="inventory-count">Loading...</div>
+                    </div>
+                    <div class="search-box">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="text" id="inventory-search" placeholder="Search brand, salt, type...">
+                    </div>
+                </div>
+
                 <div class="medicine-grid" id="medicine-grid">
                     <div id="loader">Syncing with Qubit Cloud...</div>
                 </div>
@@ -276,13 +311,14 @@
         const db = getFirestore(app);
 
         let currentUser = null;
-        let unsubscribeMedicines = null;
+        let localInventory = []; // Local memory for instant searching
 
         const grid = document.getElementById('medicine-grid');
         const addForm = document.getElementById('add-medicine-form');
         const medBrandInput = document.getElementById('med-brand');
         const medSaltsInput = document.getElementById('med-salts');
         const medMfgInput = document.getElementById('med-mfg');
+        const searchInput = document.getElementById('inventory-search');
         const autocompleteResults = document.getElementById('autocomplete-results');
         
         let debounceTimer;
@@ -296,17 +332,15 @@
             ointment: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l-2 5H8z"></path><path d="M8 8v11a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V8"></path></svg>`
         };
 
-        // --- SMART TYPE MAPPING ALGORITHM ---
+        // --- SMART TYPE MAPPING ---
         function detectMedicineType(description) {
             if (!description) return 'pill';
             const desc = description.toLowerCase();
-            
             if (desc.includes('cap')) return 'capsule';
             if (desc.includes('syr') || desc.includes('sol') || desc.includes('liq') || desc.includes('susp') || desc.includes('elix')) return 'liquid';
             if (desc.includes('drop')) return 'drops';
             if (desc.includes('inh') || desc.includes('aer') || desc.includes('spray')) return 'inhaler';
             if (desc.includes('oint') || desc.includes('crea') || desc.includes('gel') || desc.includes('lot')) return 'ointment';
-            
             return 'pill';
         }
 
@@ -351,10 +385,7 @@
                     const names = nihData[1];
                     if (names) {
                         names.forEach(name => {
-                            rawSuggestions.push({
-                                brand: name.toLowerCase(),
-                                salt: '', mfg: '', typeStr: name
-                            });
+                            rawSuggestions.push({ brand: name.toLowerCase(), salt: '', mfg: '', typeStr: name });
                         });
                     }
                 }
@@ -394,27 +425,18 @@
                     `;
                     
                     div.onclick = () => {
-                        // 1. Fill Brand Input
                         medBrandInput.value = item.brand.replace(/\b\w/g, c => c.toUpperCase());
-                        
-                        // --- NEW: SMART SALT FALLBACK LOGIC ---
-                        // If item.salt exists, use it. Otherwise, assume the brand name IS the generic salt.
                         const finalSalt = item.salt || item.brand;
                         medSaltsInput.value = finalSalt.replace(/\b\w/g, c => c.toUpperCase());
-                        
-                        // 3. Fill Manufacturer if available
                         if(item.mfg) medMfgInput.value = item.mfg;
                         
-                        // 4. Dynamically click the correct Radio Button icon
                         const targetRadio = document.querySelector(`input[value="${item.mappedType}"]`);
                         if(targetRadio) targetRadio.checked = true;
 
                         autocompleteResults.classList.add('hidden');
                     };
-                    
                     autocompleteResults.appendChild(div);
                 });
-                
                 autocompleteResults.classList.remove('hidden');
             } catch (error) {
                 autocompleteResults.classList.add('hidden');
@@ -442,17 +464,53 @@
             const medicinesRef = collection(db, 'users', currentUser.uid, 'medicines');
             const q = query(medicinesRef, orderBy('createdAt', 'desc'));
 
-            unsubscribeMedicines = onSnapshot(q, (snapshot) => {
-                grid.innerHTML = '';
-                if (snapshot.empty) {
-                    grid.innerHTML = '<div id="loader">Your inventory is empty.</div>';
-                    return;
-                }
-                snapshot.forEach(docSnap => renderCard(docSnap.id, docSnap.data()));
+            onSnapshot(q, (snapshot) => {
+                localInventory = []; // Clear local copy
+                snapshot.forEach(docSnap => {
+                    localInventory.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                renderInventory(); // Render the full list
             });
         }
 
-        // 2. Render Complex Clinical UI
+        // --- NEW: INSTANT LOCAL SEARCH ---
+        searchInput.addEventListener('input', (e) => {
+            renderInventory(e.target.value);
+        });
+
+        function renderInventory(filterText = '') {
+            grid.innerHTML = '';
+            
+            if (localInventory.length === 0) {
+                grid.innerHTML = '<div id="loader">Your inventory is empty.</div>';
+                document.getElementById('inventory-count').textContent = '0 items tracked';
+                return;
+            }
+
+            const lowerFilter = filterText.toLowerCase();
+            
+            // Filter array based on multiple fields
+            const filtered = localInventory.filter(item => {
+                if (!filterText) return true;
+                const brand = (item.brand || item.name || '').toLowerCase();
+                const salts = (item.salts || '').toLowerCase();
+                const type = (item.type || '').toLowerCase();
+                const mfg = (item.manufacturer || '').toLowerCase();
+                
+                return brand.includes(lowerFilter) || salts.includes(lowerFilter) || type.includes(lowerFilter) || mfg.includes(lowerFilter);
+            });
+
+            document.getElementById('inventory-count').textContent = `${filtered.length} item${filtered.length !== 1 ? 's' : ''} found`;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div id="loader">No matching medicines found.</div>';
+                return;
+            }
+
+            filtered.forEach(data => renderCard(data.id, data));
+        }
+
+        // 2. Render Cards with Dynamic Borders
         function renderCard(id, data) {
             const card = document.createElement('div');
             card.className = 'med-card';
@@ -465,18 +523,26 @@
             const daysToExpiry = Math.ceil((expDate - today) / (1000 * 3600 * 24));
 
             let badgesHTML = '';
+            let statusColor = 'var(--success)'; // Default to healthy green
+            
+            if (qty < 5 || daysToExpiry < 0) {
+                statusColor = 'var(--danger)';
+            } else if (daysToExpiry <= 30) {
+                statusColor = 'var(--warning)';
+            }
+
+            // Apply dynamic border
+            card.style.borderLeftColor = statusColor;
+
             if (qty < 5) badgesHTML += `<span class="badge danger">Low Stock (${qty})</span>`;
             if (daysToExpiry < 0) badgesHTML += `<span class="badge danger">Expired</span>`;
             else if (daysToExpiry <= 30) badgesHTML += `<span class="badge warning">Expiring in ${daysToExpiry} days</span>`;
+            else badgesHTML += `<span class="badge success">Stock Healthy</span>`;
 
             const medIcon = icons[data.type] || icons['pill'];
             const displayBrand = data.brand || data.name || 'Unknown';
-            
-            // Only render salt if it's different from the brand to keep cards clean
             const displaySalt = (data.salts && data.salts.toLowerCase() !== displayBrand.toLowerCase()) 
-                                ? `<div class="med-salt-text">${escapeHTML(data.salts)}</div>` 
-                                : '';
-                                
+                                ? `<div class="med-salt-text">${escapeHTML(data.salts)}</div>` : '';
             const displayMfg = data.manufacturer ? `<div class="med-mfg-text">By ${escapeHTML(data.manufacturer)}</div>` : '';
 
             card.innerHTML = `
@@ -539,7 +605,6 @@
                 medMfgInput.value = '';
                 document.getElementById('med-qty').value = '';
                 document.getElementById('med-exp').value = '';
-                
                 document.getElementById('type-pill').checked = true;
                 autocompleteResults.classList.add('hidden'); 
             } catch (error) {

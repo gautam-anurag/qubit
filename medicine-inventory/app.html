@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Qubit | Medicine Inventory</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-oled: #000000;
+            --bg-panel: #0a0a0a;
+            --bg-card: #121212;
+            --text-main: #ffffff;
+            --text-muted: #888888;
+            --border-color: #222222;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --danger: #ef4444;
+            --danger-bg: rgba(239, 68, 68, 0.1);
+            --warning: #f59e0b;
+            --warning-bg: rgba(245, 158, 11, 0.1);
+            --success: #10b981;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-oled);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* --- Header --- */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+
+        .brand { font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
+        .brand span { color: var(--primary); }
+        
+        .user-controls { display: flex; align-items: center; gap: 1rem; font-size: 0.9rem; }
+        .logout-btn {
+            background: transparent; border: 1px solid var(--border-color); color: var(--text-main);
+            padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; transition: all 0.2s;
+        }
+        .logout-btn:hover { background: var(--bg-card); border-color: var(--text-muted); }
+
+        /* --- Layout Grid --- */
+        .dashboard-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+        @media (min-width: 768px) {
+            .dashboard-layout { grid-template-columns: 350px 1fr; }
+        }
+
+        /* --- Forms & Panels --- */
+        .panel {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .panel-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 1.25rem; }
+
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+        .form-group input {
+            width: 100%; padding: 0.75rem 1rem; background-color: var(--bg-oled);
+            border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main);
+            font-family: inherit; transition: border-color 0.2s;
+        }
+        .form-group input:focus { outline: none; border-color: var(--primary); }
+        
+        .btn-primary {
+            width: 100%; background-color: var(--primary); color: white; border: none;
+            padding: 0.85rem; border-radius: 8px; font-weight: 600; cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+
+        /* --- Medicine Grid --- */
+        .medicine-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .med-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            transition: transform 0.2s;
+        }
+        .med-card:hover { border-color: #333333; }
+
+        .med-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+        .med-name { font-size: 1.1rem; font-weight: 600; word-break: break-word; }
+        
+        .med-actions button {
+            background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 4px;
+        }
+        .med-actions button:hover { color: var(--danger); }
+
+        .med-details { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem; flex-grow: 1; }
+        .med-details div { margin-bottom: 0.25rem; }
+        .med-details strong { color: var(--text-main); }
+
+        .badge-container { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; min-height: 24px; }
+        .badge {
+            font-size: 0.75rem; font-weight: 600; padding: 0.25rem 0.5rem; border-radius: 4px;
+            border: 1px solid transparent;
+        }
+        .badge.danger { background-color: var(--danger-bg); color: var(--danger); border-color: var(--danger); }
+        .badge.warning { background-color: var(--warning-bg); color: var(--warning); border-color: var(--warning); }
+
+        .qty-controls {
+            display: flex; align-items: center; justify-content: space-between;
+            background: var(--bg-oled); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.25rem;
+        }
+        .qty-btn {
+            background: var(--bg-panel); border: none; color: var(--text-main); width: 32px; height: 32px;
+            border-radius: 6px; cursor: pointer; font-weight: bold;
+        }
+        .qty-btn:hover { background: #222222; }
+        .qty-display { font-weight: 600; font-size: 0.95rem; }
+
+        /* Loader */
+        #loader { text-align: center; color: var(--text-muted); padding: 2rem; grid-column: 1 / -1; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header class="app-header">
+            <div class="brand">Qubit <span>| Inventory</span></div>
+            <div class="user-controls">
+                <span id="user-email">Loading...</span>
+                <button id="logout-btn" class="logout-btn">Sign Out</button>
+            </div>
+        </header>
+
+        <div class="dashboard-layout">
+            <!-- Left Sidebar: Add Medicine Form -->
+            <aside>
+                <div class="panel">
+                    <h2 class="panel-title">Add New Medicine</h2>
+                    <form id="add-medicine-form">
+                        <div class="form-group">
+                            <label for="med-name">Medicine Name</label>
+                            <input type="text" id="med-name" placeholder="e.g., Amoxicillin 500mg" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="med-qty">Pill Count / Quantity</label>
+                            <input type="number" id="med-qty" placeholder="e.g., 30" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="med-exp">Expiration Date</label>
+                            <input type="date" id="med-exp" required>
+                        </div>
+                        <button type="submit" class="btn-primary" id="submit-btn">Add to Inventory</button>
+                    </form>
+                </div>
+            </aside>
+
+            <!-- Right Main Area: Inventory List -->
+            <main>
+                <div class="medicine-grid" id="medicine-grid">
+                    <div id="loader">Syncing with Qubit Cloud...</div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Firebase Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDdavvZjFC1xo3reedoJyecBJCFXyo7vIM",
+            authDomain: "my-qubit.firebaseapp.com",
+            projectId: "my-qubit",
+            storageBucket: "my-qubit.firebasestorage.app",
+            messagingSenderId: "68819998084",
+            appId: "1:68819998084:web:02ff7dd40e78659ea1f9d1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        let unsubscribeMedicines = null;
+
+        const grid = document.getElementById('medicine-grid');
+        const addForm = document.getElementById('add-medicine-form');
+
+        // 1. Authentication Listener
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('user-email').textContent = user.email;
+                fetchMedicines();
+            } else {
+                window.location.href = 'login.html'; // Redirect to your fixed login page
+            }
+        });
+
+        // 2. Fetch and Render Data in Real-Time
+        function fetchMedicines() {
+            // Store medicines in a subcollection uniquely tied to the logged-in user
+            const medicinesRef = collection(db, 'users', currentUser.uid, 'medicines');
+            const q = query(medicinesRef, orderBy('createdAt', 'desc'));
+
+            unsubscribeMedicines = onSnapshot(q, (snapshot) => {
+                grid.innerHTML = '';
+                if (snapshot.empty) {
+                    grid.innerHTML = '<div id="loader">Your inventory is empty.</div>';
+                    return;
+                }
+
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    renderCard(docSnap.id, data);
+                });
+            }, (error) => {
+                console.error("Error fetching medicines:", error);
+                grid.innerHTML = '<div id="loader" style="color: var(--danger)">Error loading data. Check console.</div>';
+            });
+        }
+
+        // 3. UI Rendering & Alert Logic
+        function renderCard(id, data) {
+            const card = document.createElement('div');
+            card.className = 'med-card';
+
+            // Evaluators for UI Alerts
+            const qty = parseInt(data.quantity);
+            const expDate = new Date(data.expiryDate);
+            const today = new Date();
+            
+            // Strip time for accurate day calculation
+            today.setHours(0, 0, 0, 0); 
+            expDate.setHours(0, 0, 0, 0);
+            
+            const daysToExpiry = Math.ceil((expDate - today) / (1000 * 3600 * 24));
+
+            let badgesHTML = '';
+            
+            // Feature: Track if pills are less than 5
+            if (qty < 5) {
+                badgesHTML += `<span class="badge danger">Low Stock (${qty} left)</span>`;
+            }
+            
+            // Feature: Track if getting expired
+            if (daysToExpiry < 0) {
+                badgesHTML += `<span class="badge danger">Expired</span>`;
+            } else if (daysToExpiry <= 30) {
+                badgesHTML += `<span class="badge warning">Expiring in ${daysToExpiry} days</span>`;
+            }
+
+            card.innerHTML = `
+                <div class="med-header">
+                    <div class="med-name">${escapeHTML(data.name)}</div>
+                    <div class="med-actions">
+                        <button onclick="deleteMedicine('${id}')" title="Delete">
+                            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="badge-container">${badgesHTML}</div>
+                <div class="med-details">
+                    <div>Expires: <strong>${formatDate(data.expiryDate)}</strong></div>
+                </div>
+                <div class="qty-controls">
+                    <button class="qty-btn" onclick="updateQuantity('${id}', ${qty}, -1)">-</button>
+                    <span class="qty-display">${qty}</span>
+                    <button class="qty-btn" onclick="updateQuantity('${id}', ${qty}, 1)">+</button>
+                </div>
+            `;
+            grid.appendChild(card);
+        }
+
+        // 4. Add Medicine (Create)
+        addForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submit-btn');
+            btn.textContent = 'Adding...';
+            btn.disabled = true;
+
+            const name = document.getElementById('med-name').value;
+            const qty = document.getElementById('med-qty').value;
+            const exp = document.getElementById('med-exp').value;
+
+            try {
+                const medicinesRef = collection(db, 'users', currentUser.uid, 'medicines');
+                await addDoc(medicinesRef, {
+                    name: name,
+                    quantity: parseInt(qty),
+                    expiryDate: exp,
+                    createdAt: serverTimestamp()
+                });
+                addForm.reset();
+            } catch (error) {
+                console.error("Error adding document: ", error);
+                alert("Failed to add medicine.");
+            } finally {
+                btn.textContent = 'Add to Inventory';
+                btn.disabled = false;
+            }
+        });
+
+        // 5. Update Quantity (Update)
+        window.updateQuantity = async (id, currentQty, change) => {
+            const newQty = currentQty + change;
+            if (newQty < 0) return; // Prevent negative stock
+            
+            const docRef = doc(db, 'users', currentUser.uid, 'medicines', id);
+            try {
+                await updateDoc(docRef, { quantity: newQty });
+            } catch (error) {
+                console.error("Error updating quantity: ", error);
+            }
+        };
+
+        // 6. Delete Medicine (Delete)
+        window.deleteMedicine = async (id) => {
+            if (!confirm("Remove this medicine from your inventory?")) return;
+            const docRef = doc(db, 'users', currentUser.uid, 'medicines', id);
+            try {
+                await deleteDoc(docRef);
+            } catch (error) {
+                console.error("Error deleting document: ", error);
+            }
+        };
+
+        // Logout Flow
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            signOut(auth).then(() => window.location.href = 'login.html');
+        });
+
+        // Utility: Prevent XSS injection in names
+        function escapeHTML(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // Utility: Format Date nicely
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString(undefined, options);
+        }
+    </script>
+</body>
+</html>

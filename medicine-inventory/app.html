@@ -82,9 +82,14 @@
         }
         .autocomplete-item:last-child { border-bottom: none; }
         .autocomplete-item:hover { background-color: var(--primary); color: white; }
+        
+        .ac-header { display: flex; justify-content: space-between; align-items: center; }
         .ac-brand { font-weight: 600; text-transform: capitalize; }
-        .ac-salt { font-size: 0.75rem; color: var(--text-muted); text-transform: capitalize; }
-        .autocomplete-item:hover .ac-salt { color: rgba(255,255,255,0.7); }
+        .ac-type { font-size: 0.7rem; padding: 2px 6px; background: rgba(255,255,255,0.1); border-radius: 4px; text-transform: uppercase; }
+        .ac-salt { font-size: 0.75rem; color: var(--text-muted); text-transform: capitalize; margin-top: 2px; }
+        .ac-mfg { font-size: 0.7rem; color: #a1a1aa; margin-top: 4px; }
+        
+        .autocomplete-item:hover .ac-salt, .autocomplete-item:hover .ac-mfg { color: rgba(255,255,255,0.8); }
 
         /* --- Med Type Selectors --- */
         .type-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
@@ -122,6 +127,7 @@
         }
         .med-brand-text { font-size: 1.05rem; font-weight: 600; word-break: break-word; line-height: 1.2; text-transform: capitalize; }
         .med-salt-text { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem; text-transform: capitalize; line-height: 1.3; }
+        .med-mfg-text { font-size: 0.75rem; color: #6366f1; margin-top: 0.35rem; font-weight: 500; }
         
         .med-actions button { background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; }
         .med-actions button:hover { color: var(--danger); }
@@ -164,7 +170,13 @@
                     <form id="add-medicine-form" autocomplete="off">
                         
                         <div class="form-group">
-                            <label>Medicine Type</label>
+                            <label for="med-brand">Trade / Brand Name</label>
+                            <input type="text" id="med-brand" placeholder="e.g., Xyzal" required>
+                            <div id="autocomplete-results" class="autocomplete-dropdown hidden"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Medicine Type (Auto-detected)</label>
                             <div class="type-grid">
                                 <div>
                                     <input type="radio" name="med-type" id="type-pill" value="pill" class="type-radio" checked>
@@ -210,26 +222,26 @@
                                 </div>
                             </div>
                         </div>
-
-                        <div class="form-group">
-                            <label for="med-brand">Brand / Trade Name</label>
-                            <input type="text" id="med-brand" placeholder="e.g., Xyzal" required>
-                            <div id="autocomplete-results" class="autocomplete-dropdown hidden"></div>
-                        </div>
                         
                         <div class="form-group">
-                            <label for="med-salts">Formulation / Salts</label>
+                            <label for="med-salts">Generic / Salts</label>
                             <input type="text" id="med-salts" placeholder="e.g., Levocetirizine">
                         </div>
-
-                        <div class="form-group">
-                            <label for="med-qty">Current Quantity</label>
-                            <input type="number" id="med-qty" placeholder="e.g., 30" min="0" required>
-                        </div>
                         
                         <div class="form-group">
-                            <label for="med-exp">Expiration Date</label>
-                            <input type="date" id="med-exp" required>
+                            <label for="med-mfg">Manufacturer</label>
+                            <input type="text" id="med-mfg" placeholder="e.g., Dr. Reddy's Laboratories">
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label for="med-qty">Current Qty</label>
+                                <input type="number" id="med-qty" placeholder="30" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="med-exp">Expiry Date</label>
+                                <input type="date" id="med-exp" required>
+                            </div>
                         </div>
                         
                         <button type="submit" class="btn-primary" id="submit-btn">Add to Inventory</button>
@@ -270,11 +282,11 @@
         const addForm = document.getElementById('add-medicine-form');
         const medBrandInput = document.getElementById('med-brand');
         const medSaltsInput = document.getElementById('med-salts');
+        const medMfgInput = document.getElementById('med-mfg');
         const autocompleteResults = document.getElementById('autocomplete-results');
         
         let debounceTimer;
 
-        // --- SVGs Dictionary ---
         const icons = {
             pill: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7"></circle><line x1="7.05" y1="12" x2="16.95" y2="12"></line></svg>`,
             capsule: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="14" height="6" rx="3" transform="rotate(-45 12 13)"></rect><path d="M7 10l5 5"></path></svg>`,
@@ -284,7 +296,20 @@
             ointment: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l-2 5H8z"></path><path d="M8 8v11a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V8"></path></svg>`
         };
 
-        // --- DUAL API AUTOCOMPLETE ---
+        // --- SMART TYPE MAPPING ALGORITHM ---
+        function detectMedicineType(description) {
+            if (!description) return 'pill';
+            const desc = description.toLowerCase();
+            
+            if (desc.includes('cap')) return 'capsule';
+            if (desc.includes('syr') || desc.includes('sol') || desc.includes('liq') || desc.includes('susp') || desc.includes('elix')) return 'liquid';
+            if (desc.includes('drop')) return 'drops';
+            if (desc.includes('inh') || desc.includes('aer') || desc.includes('spray')) return 'inhaler';
+            if (desc.includes('oint') || desc.includes('crea') || desc.includes('gel') || desc.includes('lot')) return 'ointment';
+            
+            return 'pill'; // Default fallback for tablets, pills, lozenges
+        }
+
         medBrandInput.addEventListener('input', (e) => {
             clearTimeout(debounceTimer);
             const query = e.target.value.trim();
@@ -298,7 +323,6 @@
 
         async function fetchDualSuggestions(searchQuery) {
             try {
-                // Fire both requests simultaneously
                 const [fdaRes, nihRes] = await Promise.allSettled([
                     fetch(`https://api.fda.gov/drug/ndc.json?search=brand_name:"${searchQuery}*"&limit=10`),
                     fetch(`https://clinicaltables.nlm.nih.gov/api/rxterms/v3/search?terms=${searchQuery}`)
@@ -306,7 +330,6 @@
 
                 let rawSuggestions = [];
 
-                // 1. Process FDA Data (Rich structural mapping for Salts)
                 if (fdaRes.status === 'fulfilled' && fdaRes.value.ok) {
                     const fdaData = await fdaRes.value.json();
                     if (fdaData.results) {
@@ -314,14 +337,15 @@
                             if (drug.brand_name) {
                                 rawSuggestions.push({
                                     brand: drug.brand_name.toLowerCase(),
-                                    salt: drug.generic_name ? drug.generic_name.toLowerCase() : ''
+                                    salt: drug.generic_name ? drug.generic_name.toLowerCase() : '',
+                                    mfg: drug.labeler_name ? drug.labeler_name : '',
+                                    typeStr: drug.dosage_form ? drug.dosage_form.join(' ') : ''
                                 });
                             }
                         });
                     }
                 }
 
-                // 2. Process NIH Data (Broad fallback mapping)
                 if (nihRes.status === 'fulfilled' && nihRes.value.ok) {
                     const nihData = await nihRes.value.json();
                     const names = nihData[1];
@@ -329,19 +353,20 @@
                         names.forEach(name => {
                             rawSuggestions.push({
                                 brand: name.toLowerCase(),
-                                salt: '' 
+                                salt: '', mfg: '', typeStr: name
                             });
                         });
                     }
                 }
 
-                // 3. Deduplicate based on Brand Name
                 const uniqueSuggestions = [];
                 const seenBrands = new Set();
                 
                 rawSuggestions.forEach(item => {
-                    if (!seenBrands.has(item.brand)) {
-                        seenBrands.add(item.brand);
+                    const key = item.brand + (item.mfg || ''); // Differentiate by mfg if brand is identical
+                    if (!seenBrands.has(key)) {
+                        seenBrands.add(key);
+                        item.mappedType = detectMedicineType(item.typeStr);
                         uniqueSuggestions.push(item);
                     }
                 });
@@ -351,28 +376,33 @@
                     return;
                 }
 
-                // 4. Render Results
                 autocompleteResults.innerHTML = '';
                 uniqueSuggestions.forEach(item => {
                     const div = document.createElement('div');
                     div.className = 'autocomplete-item';
                     
-                    const brandSpan = document.createElement('span');
-                    brandSpan.className = 'ac-brand';
-                    brandSpan.textContent = item.brand;
-                    div.appendChild(brandSpan);
+                    const mfgDisplay = item.mfg ? `<div class="ac-mfg">Mfg: ${item.mfg}</div>` : '';
+                    const saltDisplay = item.salt ? `<div class="ac-salt">${item.salt}</div>` : '';
 
-                    if (item.salt) {
-                        const saltSpan = document.createElement('span');
-                        saltSpan.className = 'ac-salt';
-                        saltSpan.textContent = item.salt;
-                        div.appendChild(saltSpan);
-                    }
+                    div.innerHTML = `
+                        <div class="ac-header">
+                            <span class="ac-brand">${item.brand}</span>
+                            <span class="ac-type">${item.mappedType}</span>
+                        </div>
+                        ${saltDisplay}
+                        ${mfgDisplay}
+                    `;
                     
-                    // Route the data directly into BOTH fields when clicked
                     div.onclick = () => {
+                        // 1. Fill Text Inputs
                         medBrandInput.value = item.brand.replace(/\b\w/g, c => c.toUpperCase());
-                        medSaltsInput.value = item.salt.replace(/\b\w/g, c => c.toUpperCase());
+                        if(item.salt) medSaltsInput.value = item.salt.replace(/\b\w/g, c => c.toUpperCase());
+                        if(item.mfg) medMfgInput.value = item.mfg;
+                        
+                        // 2. Dynamically click the correct Radio Button icon
+                        const targetRadio = document.querySelector(`input[value="${item.mappedType}"]`);
+                        if(targetRadio) targetRadio.checked = true;
+
                         autocompleteResults.classList.add('hidden');
                     };
                     
@@ -381,7 +411,6 @@
                 
                 autocompleteResults.classList.remove('hidden');
             } catch (error) {
-                console.error("Autocomplete failure:", error);
                 autocompleteResults.classList.add('hidden');
             }
         }
@@ -435,10 +464,9 @@
             else if (daysToExpiry <= 30) badgesHTML += `<span class="badge warning">Expiring in ${daysToExpiry} days</span>`;
 
             const medIcon = icons[data.type] || icons['pill'];
-            
-            // Backwards compatibility if data.brand doesn't exist on older documents
             const displayBrand = data.brand || data.name || 'Unknown';
             const displaySalt = data.salts ? `<div class="med-salt-text">${escapeHTML(data.salts)}</div>` : '';
+            const displayMfg = data.manufacturer ? `<div class="med-mfg-text">By ${escapeHTML(data.manufacturer)}</div>` : '';
 
             card.innerHTML = `
                 <div class="med-header">
@@ -447,6 +475,7 @@
                         <div>
                             <div class="med-brand-text">${escapeHTML(displayBrand)}</div>
                             ${displaySalt}
+                            ${displayMfg}
                         </div>
                     </div>
                     <div class="med-actions">
@@ -477,6 +506,7 @@
 
             const brand = document.getElementById('med-brand').value;
             const salts = document.getElementById('med-salts').value;
+            const mfg = document.getElementById('med-mfg').value;
             const qty = document.getElementById('med-qty').value;
             const exp = document.getElementById('med-exp').value;
             const type = document.querySelector('input[name="med-type"]:checked').value;
@@ -486,6 +516,7 @@
                 await addDoc(medicinesRef, {
                     brand: brand,
                     salts: salts,
+                    manufacturer: mfg,
                     quantity: parseInt(qty),
                     expiryDate: exp,
                     type: type,
@@ -494,8 +525,12 @@
                 
                 medBrandInput.value = '';
                 medSaltsInput.value = '';
+                medMfgInput.value = '';
                 document.getElementById('med-qty').value = '';
                 document.getElementById('med-exp').value = '';
+                
+                // Reset radio to default pill
+                document.getElementById('type-pill').checked = true;
                 autocompleteResults.classList.add('hidden'); 
             } catch (error) {
                 alert("Failed to add medicine.");

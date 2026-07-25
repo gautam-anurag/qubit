@@ -23,6 +23,7 @@
             --warning: #f59e0b;
             --warning-bg: rgba(245, 158, 11, 0.1);
             --success: #10b981;
+            --overlay: rgba(0, 0, 0, 0.85);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -33,6 +34,7 @@
             color: var(--text-main);
             min-height: 100vh;
             padding: 2rem 1rem;
+            padding-bottom: 6rem; /* Space for FAB */
         }
 
         .container { max-width: 1200px; margin: 0 auto; }
@@ -52,64 +54,6 @@
         }
         .logout-btn:hover { background: var(--bg-card); border-color: var(--text-muted); }
 
-        /* --- Layout Grid --- */
-        .dashboard-layout { display: grid; grid-template-columns: 1fr; gap: 2rem; }
-        @media (min-width: 850px) { .dashboard-layout { grid-template-columns: 360px 1fr; } }
-
-        /* --- Forms & Panels --- */
-        .panel { background-color: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; }
-        .panel-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 1.25rem; }
-
-        .form-group { margin-bottom: 1.25rem; position: relative; }
-        .form-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; }
-        .form-group input {
-            width: 100%; padding: 0.75rem 1rem; background-color: var(--bg-oled);
-            border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main);
-            font-family: inherit; transition: border-color 0.2s;
-        }
-        .form-group input:focus { outline: none; border-color: var(--primary); }
-        
-        /* --- Smart Autocomplete Dropdown --- */
-        .autocomplete-dropdown {
-            position: absolute; top: 100%; left: 0; width: 100%; background-color: var(--bg-card);
-            border: 1px solid var(--border-color); border-radius: 8px; margin-top: 4px;
-            max-height: 200px; overflow-y: auto; z-index: 100; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-        }
-        .autocomplete-dropdown.hidden { display: none; }
-        .autocomplete-item {
-            padding: 0.75rem 1rem; cursor: pointer; font-size: 0.9rem; display: flex; flex-direction: column;
-            border-bottom: 1px solid var(--border-color); transition: background-color 0.15s;
-        }
-        .autocomplete-item:last-child { border-bottom: none; }
-        .autocomplete-item:hover { background-color: var(--primary); color: white; }
-        
-        .ac-header { display: flex; justify-content: space-between; align-items: center; }
-        .ac-brand { font-weight: 600; text-transform: capitalize; }
-        .ac-type { font-size: 0.7rem; padding: 2px 6px; background: rgba(255,255,255,0.1); border-radius: 4px; text-transform: uppercase; }
-        .ac-salt { font-size: 0.75rem; color: var(--text-muted); text-transform: capitalize; margin-top: 2px; }
-        .ac-mfg { font-size: 0.7rem; color: #a1a1aa; margin-top: 4px; }
-        
-        .autocomplete-item:hover .ac-salt, .autocomplete-item:hover .ac-mfg { color: rgba(255,255,255,0.8); }
-
-        /* --- Med Type Selectors --- */
-        .type-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
-        .type-radio { display: none; }
-        .type-label {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            gap: 0.25rem; padding: 0.5rem; background-color: var(--bg-oled); border: 1px solid var(--border-color);
-            border-radius: 8px; cursor: pointer; transition: all 0.2s; color: var(--text-muted); font-size: 0.75rem;
-        }
-        .type-label:hover { border-color: var(--text-muted); color: var(--text-main); }
-        .type-radio:checked + .type-label {
-            border-color: var(--primary); background-color: rgba(37, 99, 235, 0.1); color: var(--primary);
-        }
-
-        .btn-primary {
-            width: 100%; background-color: var(--primary); color: white; border: none;
-            padding: 0.85rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background-color 0.2s;
-        }
-        .btn-primary:hover { background-color: var(--primary-hover); }
-
         /* --- Inventory Header & Search --- */
         .inventory-header {
             display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem;
@@ -117,9 +61,7 @@
         @media(min-width: 640px) {
             .inventory-header { flex-direction: row; justify-content: space-between; align-items: flex-end; }
         }
-        .search-box {
-            position: relative; width: 100%; max-width: 350px;
-        }
+        .search-box { position: relative; width: 100%; max-width: 350px; }
         .search-box input {
             width: 100%; padding: 0.6rem 1rem 0.6rem 2.5rem; background-color: var(--bg-card);
             border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main);
@@ -137,7 +79,7 @@
         .med-card {
             background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px;
             padding: 1.25rem; display: flex; flex-direction: column; position: relative; transition: transform 0.2s;
-            border-left: 4px solid var(--border-color); /* Status Indicator Default */
+            border-left: 4px solid var(--border-color);
         }
         .med-card:hover { border-color: #333333; }
 
@@ -174,6 +116,111 @@
         .qty-display { font-weight: 600; font-size: 0.95rem; }
 
         #loader { text-align: center; color: var(--text-muted); padding: 2rem; grid-column: 1 / -1; }
+
+        /* --- Floating Action Button --- */
+        .fab {
+            position: fixed; bottom: 2rem; right: 2rem;
+            width: 60px; height: 60px; border-radius: 50%;
+            background-color: var(--primary); color: white;
+            border: none; cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4);
+            z-index: 50; transition: transform 0.2s, background-color 0.2s;
+        }
+        .fab:hover { background-color: var(--primary-hover); transform: scale(1.05); }
+        .fab:active { transform: scale(0.95); }
+
+        /* --- Modal System --- */
+        .modal-overlay {
+            position: fixed; inset: 0; background-color: var(--overlay);
+            backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+            display: flex; justify-content: center; align-items: flex-end; /* Mobile default: bottom up */
+            z-index: 1000;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        .modal-overlay.open { opacity: 1; pointer-events: auto; }
+        
+        .modal-content {
+            background-color: var(--bg-panel); width: 100%; height: 100vh; /* Edge-to-edge on mobile */
+            overflow-y: auto; display: flex; flex-direction: column;
+            transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .modal-overlay.open .modal-content { transform: translateY(0); }
+
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1.5rem; border-bottom: 1px solid var(--border-color);
+            position: sticky; top: 0; background-color: var(--bg-panel); z-index: 10;
+        }
+        .modal-title { font-size: 1.2rem; font-weight: 600; }
+        .close-modal-btn {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            color: var(--text-main); width: 36px; height: 36px; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center; cursor: pointer;
+        }
+        .close-modal-btn:hover { background: var(--border-color); }
+
+        .modal-body { padding: 1.5rem; padding-bottom: 3rem; }
+
+        @media(min-width: 640px) {
+            .modal-overlay { align-items: center; }
+            .modal-content {
+                height: auto; max-height: 90vh; width: 500px;
+                border-radius: 16px; border: 1px solid var(--border-color);
+                transform: translateY(20px) scale(0.95);
+            }
+            .modal-overlay.open .modal-content { transform: translateY(0) scale(1); }
+        }
+
+        /* --- Forms inside Modal --- */
+        .form-group { margin-bottom: 1.25rem; position: relative; }
+        .form-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+        .form-group input {
+            width: 100%; padding: 0.75rem 1rem; background-color: var(--bg-oled);
+            border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main);
+            font-size: 1rem; /* Prevents iOS auto-zoom */
+            font-family: inherit; transition: border-color 0.2s;
+        }
+        .form-group input:focus { outline: none; border-color: var(--primary); }
+        
+        .autocomplete-dropdown {
+            position: absolute; top: 100%; left: 0; width: 100%; background-color: var(--bg-card);
+            border: 1px solid var(--border-color); border-radius: 8px; margin-top: 4px;
+            max-height: 200px; overflow-y: auto; z-index: 100; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8);
+        }
+        .autocomplete-dropdown.hidden { display: none; }
+        .autocomplete-item {
+            padding: 0.75rem 1rem; cursor: pointer; font-size: 0.9rem; display: flex; flex-direction: column;
+            border-bottom: 1px solid var(--border-color); transition: background-color 0.15s;
+        }
+        .autocomplete-item:last-child { border-bottom: none; }
+        .autocomplete-item:hover { background-color: var(--primary); color: white; }
+        
+        .ac-header { display: flex; justify-content: space-between; align-items: center; }
+        .ac-brand { font-weight: 600; text-transform: capitalize; }
+        .ac-type { font-size: 0.7rem; padding: 2px 6px; background: rgba(255,255,255,0.1); border-radius: 4px; text-transform: uppercase; }
+        .ac-salt { font-size: 0.75rem; color: var(--text-muted); text-transform: capitalize; margin-top: 2px; }
+        .ac-mfg { font-size: 0.7rem; color: #a1a1aa; margin-top: 4px; }
+        .autocomplete-item:hover .ac-salt, .autocomplete-item:hover .ac-mfg { color: rgba(255,255,255,0.8); }
+
+        .type-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+        .type-radio { display: none; }
+        .type-label {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 0.25rem; padding: 0.5rem; background-color: var(--bg-oled); border: 1px solid var(--border-color);
+            border-radius: 8px; cursor: pointer; transition: all 0.2s; color: var(--text-muted); font-size: 0.75rem;
+        }
+        .type-label:hover { border-color: var(--text-muted); color: var(--text-main); }
+        .type-radio:checked + .type-label {
+            border-color: var(--primary); background-color: rgba(37, 99, 235, 0.1); color: var(--primary);
+        }
+
+        .btn-primary {
+            width: 100%; background-color: var(--primary); color: white; border: none;
+            padding: 1rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background-color 0.2s;
+            margin-top: 1rem;
+        }
+        .btn-primary:hover { background-color: var(--primary-hover); }
     </style>
 </head>
 <body>
@@ -187,108 +234,119 @@
             </div>
         </header>
 
-        <div class="dashboard-layout">
-            <aside>
-                <div class="panel">
-                    <h2 class="panel-title">Add New Medicine</h2>
-                    <form id="add-medicine-form" autocomplete="off">
-                        
-                        <div class="form-group">
-                            <label for="med-brand">Trade / Generic Name</label>
-                            <input type="text" id="med-brand" placeholder="e.g., Azithromycin or Xyzal" required>
-                            <div id="autocomplete-results" class="autocomplete-dropdown hidden"></div>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Medicine Type (Auto-detected)</label>
-                            <div class="type-grid">
-                                <div>
-                                    <input type="radio" name="med-type" id="type-pill" value="pill" class="type-radio" checked>
-                                    <label for="type-pill" class="type-label">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7"></circle><line x1="7.05" y1="12" x2="16.95" y2="12"></line></svg>
-                                        Tablet
-                                    </label>
-                                </div>
-                                <div>
-                                    <input type="radio" name="med-type" id="type-capsule" value="capsule" class="type-radio">
-                                    <label for="type-capsule" class="type-label">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="14" height="6" rx="3" transform="rotate(-45 12 13)"></rect><path d="M7 10l5 5"></path></svg>
-                                        Capsule
-                                    </label>
-                                </div>
-                                <div>
-                                    <input type="radio" name="med-type" id="type-liquid" value="liquid" class="type-radio">
-                                    <label for="type-liquid" class="type-label">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v3h4V2z"></path><rect x="7" y="5" width="10" height="17" rx="3"></rect><path d="M7 12h10"></path></svg>
-                                        Syrup
-                                    </label>
-                                </div>
-                                <div>
-                                    <input type="radio" name="med-type" id="type-drops" value="drops" class="type-radio">
-                                    <label for="type-drops" class="type-label">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"></path></svg>
-                                        Drops
-                                    </label>
-                                </div>
-                                <div>
-                                    <input type="radio" name="med-type" id="type-inhaler" value="inhaler" class="type-radio">
-                                    <label for="type-inhaler" class="type-label">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21v-5a3 3 0 0 1 3-3h1"></path><path d="M16 13h2a3 3 0 0 1 3 3v5"></path><path d="M16 3h-5a3 3 0 0 0-3 3v7h8V6a3 3 0 0 0-3-3z"></path></svg>
-                                        Inhaler
-                                    </label>
-                                </div>
-                                <div>
-                                    <input type="radio" name="med-type" id="type-ointment" value="ointment" class="type-radio">
-                                    <label for="type-ointment" class="type-label">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l-2 5H8z"></path><path d="M8 8v11a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V8"></path></svg>
-                                        Cream
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="med-salts">Formulation / Salts</label>
-                            <input type="text" id="med-salts" placeholder="e.g., Azithromycin">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="med-mfg">Manufacturer</label>
-                            <input type="text" id="med-mfg" placeholder="e.g., Pfizer">
-                        </div>
-
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                            <div class="form-group">
-                                <label for="med-qty">Current Qty</label>
-                                <input type="number" id="med-qty" placeholder="30" min="0" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="med-exp">Expiry Date</label>
-                                <input type="date" id="med-exp" required>
-                            </div>
-                        </div>
-                        
-                        <button type="submit" class="btn-primary" id="submit-btn">Add to Inventory</button>
-                    </form>
+        <main>
+            <div class="inventory-header">
+                <div>
+                    <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0;">Available Stock</h2>
+                    <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;" id="inventory-count">Loading...</div>
                 </div>
-            </aside>
+                <div class="search-box">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" id="inventory-search" placeholder="Search brand, salt, type...">
+                </div>
+            </div>
 
-            <main>
-                <div class="inventory-header">
-                    <div>
-                        <h2 class="panel-title" style="margin-bottom: 0;">Available Stock</h2>
-                        <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;" id="inventory-count">Loading...</div>
+            <div class="medicine-grid" id="medicine-grid">
+                <div id="loader">Syncing with Qubit Cloud...</div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Floating Action Button -->
+    <button class="fab" id="open-modal-btn" aria-label="Add Medicine">
+        <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+    </button>
+
+    <!-- Edge-to-Edge Modal -->
+    <div class="modal-overlay" id="add-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Add New Medicine</div>
+                <button class="close-modal-btn" id="close-modal-btn" aria-label="Close">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <form id="add-medicine-form" autocomplete="off">
+                    <div class="form-group">
+                        <label for="med-brand">Trade / Generic Name</label>
+                        <input type="text" id="med-brand" placeholder="e.g., Azithromycin or Xyzal" required>
+                        <div id="autocomplete-results" class="autocomplete-dropdown hidden"></div>
                     </div>
-                    <div class="search-box">
-                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        <input type="text" id="inventory-search" placeholder="Search brand, salt, type...">
-                    </div>
-                </div>
 
-                <div class="medicine-grid" id="medicine-grid">
-                    <div id="loader">Syncing with Qubit Cloud...</div>
-                </div>
-            </main>
+                    <div class="form-group">
+                        <label>Medicine Type (Auto-detected)</label>
+                        <div class="type-grid">
+                            <div>
+                                <input type="radio" name="med-type" id="type-pill" value="pill" class="type-radio" checked>
+                                <label for="type-pill" class="type-label">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7"></circle><line x1="7.05" y1="12" x2="16.95" y2="12"></line></svg>
+                                    Tablet
+                                </label>
+                            </div>
+                            <div>
+                                <input type="radio" name="med-type" id="type-capsule" value="capsule" class="type-radio">
+                                <label for="type-capsule" class="type-label">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="14" height="6" rx="3" transform="rotate(-45 12 13)"></rect><path d="M7 10l5 5"></path></svg>
+                                    Capsule
+                                </label>
+                            </div>
+                            <div>
+                                <input type="radio" name="med-type" id="type-liquid" value="liquid" class="type-radio">
+                                <label for="type-liquid" class="type-label">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v3h4V2z"></path><rect x="7" y="5" width="10" height="17" rx="3"></rect><path d="M7 12h10"></path></svg>
+                                    Syrup
+                                </label>
+                            </div>
+                            <div>
+                                <input type="radio" name="med-type" id="type-drops" value="drops" class="type-radio">
+                                <label for="type-drops" class="type-label">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"></path></svg>
+                                    Drops
+                                </label>
+                            </div>
+                            <div>
+                                <input type="radio" name="med-type" id="type-inhaler" value="inhaler" class="type-radio">
+                                <label for="type-inhaler" class="type-label">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21v-5a3 3 0 0 1 3-3h1"></path><path d="M16 13h2a3 3 0 0 1 3 3v5"></path><path d="M16 3h-5a3 3 0 0 0-3 3v7h8V6a3 3 0 0 0-3-3z"></path></svg>
+                                    Inhaler
+                                </label>
+                            </div>
+                            <div>
+                                <input type="radio" name="med-type" id="type-ointment" value="ointment" class="type-radio">
+                                <label for="type-ointment" class="type-label">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l-2 5H8z"></path><path d="M8 8v11a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V8"></path></svg>
+                                    Cream
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="med-salts">Formulation / Salts</label>
+                        <input type="text" id="med-salts" placeholder="e.g., Azithromycin">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="med-mfg">Manufacturer</label>
+                        <input type="text" id="med-mfg" placeholder="e.g., Pfizer">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="med-qty">Current Qty</label>
+                            <input type="number" id="med-qty" placeholder="30" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="med-exp">Expiry Date</label>
+                            <input type="date" id="med-exp" required>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary" id="submit-btn">Add to Inventory</button>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -311,7 +369,7 @@
         const db = getFirestore(app);
 
         let currentUser = null;
-        let localInventory = []; // Local memory for instant searching
+        let localInventory = []; 
 
         const grid = document.getElementById('medicine-grid');
         const addForm = document.getElementById('add-medicine-form');
@@ -321,6 +379,23 @@
         const searchInput = document.getElementById('inventory-search');
         const autocompleteResults = document.getElementById('autocomplete-results');
         
+        // Modal Logic
+        const modal = document.getElementById('add-modal');
+        const openBtn = document.getElementById('open-modal-btn');
+        const closeBtn = document.getElementById('close-modal-btn');
+        
+        const openModal = () => modal.classList.add('open');
+        const closeModal = () => {
+            modal.classList.remove('open');
+            autocompleteResults.classList.add('hidden');
+        };
+
+        openBtn.addEventListener('click', openModal);
+        closeBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal(); // Close if clicked on the overlay background
+        });
+
         let debounceTimer;
 
         const icons = {
@@ -332,7 +407,6 @@
             ointment: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l-2 5H8z"></path><path d="M8 8v11a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V8"></path></svg>`
         };
 
-        // --- SMART TYPE MAPPING ---
         function detectMedicineType(description) {
             if (!description) return 'pill';
             const desc = description.toLowerCase();
@@ -364,13 +438,11 @@
 
                 let rawSuggestions = [];
 
-                // --- NEW: Safe Parser to prevent FDA API crashes ---
                 const safeParse = (field) => {
                     if (!field) return '';
                     return Array.isArray(field) ? field.join(' ') : String(field);
                 };
 
-                // 1. Process FDA Data (Rich structural mapping for Salts)
                 if (fdaRes.status === 'fulfilled' && fdaRes.value.ok) {
                     const fdaData = await fdaRes.value.json();
                     if (fdaData.results) {
@@ -387,7 +459,6 @@
                     }
                 }
 
-                // 2. Process NIH Data (Broad fallback mapping)
                 if (nihRes.status === 'fulfilled' && nihRes.value.ok) {
                     const nihData = await nihRes.value.json();
                     const names = nihData[1];
@@ -398,7 +469,6 @@
                     }
                 }
 
-                // 3. Deduplicate
                 const uniqueSuggestions = [];
                 const seenBrands = new Set();
                 
@@ -416,7 +486,6 @@
                     return;
                 }
 
-                // 4. Render Results
                 autocompleteResults.innerHTML = '';
                 uniqueSuggestions.forEach(item => {
                     const div = document.createElement('div');
@@ -436,11 +505,8 @@
                     
                     div.onclick = () => {
                         medBrandInput.value = item.brand.replace(/\b\w/g, c => c.toUpperCase());
-                        
-                        // Smart Salt Fallback
                         const finalSalt = item.salt || item.brand;
                         medSaltsInput.value = finalSalt.replace(/\b\w/g, c => c.toUpperCase());
-                        
                         if(item.mfg) medMfgInput.value = item.mfg;
                         
                         const targetRadio = document.querySelector(`input[value="${item.mappedType}"]`);
@@ -456,12 +522,6 @@
                 autocompleteResults.classList.add('hidden');
             }
         }
-
-        document.addEventListener('click', (e) => {
-            if (!medBrandInput.contains(e.target) && !autocompleteResults.contains(e.target)) {
-                autocompleteResults.classList.add('hidden');
-            }
-        });
 
         // 1. Auth & Data Sync
         onAuthStateChanged(auth, (user) => {
@@ -479,15 +539,14 @@
             const q = query(medicinesRef, orderBy('createdAt', 'desc'));
 
             onSnapshot(q, (snapshot) => {
-                localInventory = []; // Clear local copy
+                localInventory = []; 
                 snapshot.forEach(docSnap => {
                     localInventory.push({ id: docSnap.id, ...docSnap.data() });
                 });
-                renderInventory(); // Render the full list
+                renderInventory(searchInput.value); // Re-apply search filter on sync
             });
         }
 
-        // --- NEW: INSTANT LOCAL SEARCH ---
         searchInput.addEventListener('input', (e) => {
             renderInventory(e.target.value);
         });
@@ -503,7 +562,6 @@
 
             const lowerFilter = filterText.toLowerCase();
             
-            // Filter array based on multiple fields
             const filtered = localInventory.filter(item => {
                 if (!filterText) return true;
                 const brand = (item.brand || item.name || '').toLowerCase();
@@ -524,7 +582,6 @@
             filtered.forEach(data => renderCard(data.id, data));
         }
 
-        // 2. Render Cards with Dynamic Borders
         function renderCard(id, data) {
             const card = document.createElement('div');
             card.className = 'med-card';
@@ -537,7 +594,7 @@
             const daysToExpiry = Math.ceil((expDate - today) / (1000 * 3600 * 24));
 
             let badgesHTML = '';
-            let statusColor = 'var(--success)'; // Default to healthy green
+            let statusColor = 'var(--success)'; 
             
             if (qty < 5 || daysToExpiry < 0) {
                 statusColor = 'var(--danger)';
@@ -545,7 +602,6 @@
                 statusColor = 'var(--warning)';
             }
 
-            // Apply dynamic border
             card.style.borderLeftColor = statusColor;
 
             if (qty < 5) badgesHTML += `<span class="badge danger">Low Stock (${qty})</span>`;
@@ -588,7 +644,6 @@
             grid.appendChild(card);
         }
 
-        // 3. Database Operations
         addForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submit-btn');
@@ -614,13 +669,9 @@
                     createdAt: serverTimestamp()
                 });
                 
-                medBrandInput.value = '';
-                medSaltsInput.value = '';
-                medMfgInput.value = '';
-                document.getElementById('med-qty').value = '';
-                document.getElementById('med-exp').value = '';
+                addForm.reset();
                 document.getElementById('type-pill').checked = true;
-                autocompleteResults.classList.add('hidden'); 
+                closeModal(); // Auto close the modal on success
             } catch (error) {
                 alert("Failed to add medicine.");
             } finally {

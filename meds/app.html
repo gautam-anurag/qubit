@@ -229,6 +229,7 @@
         .med-brand-text { font-size: 1.15rem; font-weight: 600; text-transform: capitalize; line-height: 1.2; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .med-salt-text { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.35rem; text-transform: capitalize; line-height: 1.4; }
         
+        .med-actions { display: flex; gap: 4px; }
         .med-actions button { background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 6px; border-radius: 6px; transition: all 0.2s; }
         .med-actions button:hover { color: var(--danger); background: var(--danger-bg); }
 
@@ -466,6 +467,22 @@
                     <p style="color: var(--text-muted); margin-bottom: 1.5rem; font-size: 1rem; line-height: 1.6;">
                         Search the comprehensive FDA, NIH, and publicly contributed Indian registries to accurately identify medications, view formulation specs, and instantly add them to your personal medicine list.
                     </p>
+                    
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                        <select id="db-selector" style="flex: 1; padding: 0.85rem 1rem; background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; color: var(--text-main); font-size: 0.9rem; cursor: pointer; outline: none;">
+                            <option value="all">All Databases</option>
+                            <option value="ind">Indian Registry (IND)</option>
+                            <option value="fda">US FDA</option>
+                            <option value="nih">NIH RxTerms</option>
+                        </select>
+                        
+                        <select id="sort-selector" style="flex: 1; padding: 0.85rem 1rem; background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; color: var(--text-main); font-size: 0.9rem; cursor: pointer; outline: none;">
+                            <option value="default">Default (Relevance)</option>
+                            <option value="az">Alphabetical (A-Z)</option>
+                            <option value="za">Alphabetical (Z-A)</option>
+                        </select>
+                    </div>
+
                     <div class="search-box" style="max-width: 100%; margin-bottom: 0;">
                         <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                         <input type="text" id="global-db-search" placeholder="Search global registry (e.g., Aspirin)...">
@@ -596,6 +613,7 @@
 
         let currentUser = null;
         let localInventory = []; 
+        let editingMedicineId = null;
 
         const icons = {
             pill: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7"></circle><line x1="7.05" y1="12" x2="16.95" y2="12"></line></svg>`,
@@ -662,7 +680,10 @@
         };
 
         document.getElementById('open-modal-btn').addEventListener('click', () => {
+            editingMedicineId = null; 
             document.getElementById('add-medicine-form').reset();
+            document.querySelector('.modal-title').textContent = 'Add New Medicine';
+            document.getElementById('submit-btn').textContent = 'Add to your list';
             openModal();
         });
         document.getElementById('close-modal-btn').addEventListener('click', closeModal);
@@ -691,116 +712,126 @@
             return div.innerHTML;
         }
 
-        // --- 3-Tier Prioritized Fetch Logic (Upgraded for Max Data) ---
+        // --- 3-Tier Prioritized Fetch Logic (Updated for Filtering) ---
         let indianMedDatabase = null;
         let isFetchingDB = false;
 
-        async function fetchExternalDB(searchQuery) {
+        async function fetchExternalDB(searchQuery, dbPref = 'all') {
             const lowerQuery = searchQuery.toLowerCase();
             const uniqueSuggestions = [];
             const seenBrands = new Set(); 
 
-            // PRIORITY 1: Indian Medicine Database (Price, Salts, Packaging)
-            if (!indianMedDatabase) {
-                if (!isFetchingDB) {
-                    isFetchingDB = true;
-                    try {
-                        const response = await fetch('https://raw.githubusercontent.com/junioralive/Indian-Medicine-Dataset/main/DATA/indian_medicine_data.json');
-                        if (response.ok) indianMedDatabase = await response.json();
-                    } catch (error) {
-                        console.error("Failed to load Indian DB:", error);
+            // PRIORITY 1: Indian Medicine Database
+            if (dbPref === 'all' || dbPref === 'ind') {
+                if (!indianMedDatabase) {
+                    if (!isFetchingDB) {
+                        isFetchingDB = true;
+                        try {
+                            const response = await fetch('https://raw.githubusercontent.com/junioralive/Indian-Medicine-Dataset/main/DATA/indian_medicine_data.json');
+                            if (response.ok) indianMedDatabase = await response.json();
+                        } catch (error) {
+                            console.error("Failed to load Indian DB:", error);
+                        }
+                        isFetchingDB = false;
                     }
-                    isFetchingDB = false;
+                }
+
+                if (indianMedDatabase) {
+                    const indianResults = indianMedDatabase
+                        .filter(med => {
+                            const nameMatch = med.name && med.name.toLowerCase().includes(lowerQuery);
+                            const saltMatch = med.short_composition1 && med.short_composition1.toLowerCase().includes(lowerQuery);
+                            return nameMatch || saltMatch;
+                        })
+                        .slice(0, 15); 
+
+                    indianResults.forEach(drug => {
+                        const brandName = escapeHTML(drug.name || '').toLowerCase();
+                        const mfgName = escapeHTML(drug.manufacturer_name || '');
+                        const key = brandName + mfgName;
+
+                        if (!seenBrands.has(key)) {
+                            seenBrands.add(key);
+                            let salts = drug.short_composition1 || '';
+                            if (drug.short_composition2) salts += ' + ' + drug.short_composition2;
+
+                            uniqueSuggestions.push({
+                                brand: brandName,
+                                salt: salts.toLowerCase(),
+                                mfg: mfgName,
+                                mappedType: detectMedicineType(drug.pack_size_label || drug.type),
+                                price: drug['price(₹)'] ? `₹${drug['price(₹)']}` : null,
+                                packSize: drug.pack_size_label || null,
+                                sideEffects: null, 
+                                warnings: null,
+                                source: '🇮🇳 IND'
+                            });
+                        }
+                    });
                 }
             }
 
-            if (indianMedDatabase) {
-                const indianResults = indianMedDatabase
-                    .filter(med => {
-                        const nameMatch = med.name && med.name.toLowerCase().includes(lowerQuery);
-                        const saltMatch = med.short_composition1 && med.short_composition1.toLowerCase().includes(lowerQuery);
-                        return nameMatch || saltMatch;
-                    })
-                    .slice(0, 15); 
+            const fetchPromises = [];
+            if (dbPref === 'all' || dbPref === 'fda') {
+                fetchPromises.push(
+                    fetch(`https://api.fda.gov/drug/label.json?search=openfda.brand_name:"${searchQuery}*"&limit=5`)
+                        .then(res => res.ok ? res.json() : null)
+                        .catch(() => null)
+                );
+            } else {
+                fetchPromises.push(Promise.resolve(null)); 
+            }
 
-                indianResults.forEach(drug => {
-                    const brandName = escapeHTML(drug.name || '').toLowerCase();
-                    const mfgName = escapeHTML(drug.manufacturer_name || '');
+            if (dbPref === 'all' || dbPref === 'nih') {
+                fetchPromises.push(
+                    fetch(`https://clinicaltables.nlm.nih.gov/api/rxterms/v3/search?terms=${searchQuery}`)
+                        .then(res => res.ok ? res.json() : null)
+                        .catch(() => null)
+                );
+            } else {
+                fetchPromises.push(Promise.resolve(null)); 
+            }
+
+            const [fdaData, nihData] = await Promise.all(fetchPromises);
+
+            // Priority 2: FDA Processing
+            if (fdaData && fdaData.results) {
+                fdaData.results.forEach(drug => {
+                    const openfda = drug.openfda || {};
+                    const brandName = safeParse(openfda.brand_name).toLowerCase();
+                    const mfgName = safeParse(openfda.manufacturer_name);
                     const key = brandName + mfgName;
 
-                    if (!seenBrands.has(key)) {
+                    if (brandName && !seenBrands.has(key)) {
                         seenBrands.add(key);
-                        let salts = drug.short_composition1 || '';
-                        if (drug.short_composition2) salts += ' + ' + drug.short_composition2;
-                        const typeString = drug.pack_size_label || drug.type;
-
                         uniqueSuggestions.push({
                             brand: brandName,
-                            salt: salts.toLowerCase(),
+                            salt: safeParse(openfda.generic_name).toLowerCase(),
                             mfg: mfgName,
-                            mappedType: detectMedicineType(typeString),
-                            price: drug['price(₹)'] ? `₹${drug['price(₹)']}` : null,
-                            packSize: drug.pack_size_label || null,
-                            sideEffects: null, 
-                            warnings: null,
-                            source: '🇮🇳 IND'
+                            mappedType: detectMedicineType(safeParse(openfda.route)),
+                            price: null, packSize: null,
+                            sideEffects: safeParse(drug.adverse_reactions),
+                            warnings: safeParse(drug.contraindications) || safeParse(drug.warnings),
+                            source: '🇺🇸 FDA'
                         });
                     }
                 });
             }
 
-            // PRIORITY 2 & 3: FDA Label API (Clinical Data) and NIH 
-            const [fdaRes, nihRes] = await Promise.allSettled([
-                fetch(`https://api.fda.gov/drug/label.json?search=openfda.brand_name:"${searchQuery}*"&limit=5`),
-                fetch(`https://clinicaltables.nlm.nih.gov/api/rxterms/v3/search?terms=${searchQuery}`)
-            ]);
-
-            // Priority 2: FDA Processing (Extracting Side Effects & Warnings)
-            if (fdaRes.status === 'fulfilled' && fdaRes.value.ok) {
-                const fdaData = await fdaRes.value.json();
-                if (fdaData.results) {
-                    fdaData.results.forEach(drug => {
-                        const openfda = drug.openfda || {};
-                        const brandName = safeParse(openfda.brand_name).toLowerCase();
-                        const mfgName = safeParse(openfda.manufacturer_name);
-                        const key = brandName + mfgName;
-
-                        if (brandName && !seenBrands.has(key)) {
-                            seenBrands.add(key);
-                            uniqueSuggestions.push({
-                                brand: brandName,
-                                salt: safeParse(openfda.generic_name).toLowerCase(),
-                                mfg: mfgName,
-                                mappedType: detectMedicineType(safeParse(openfda.route)),
-                                price: null, 
-                                packSize: null,
-                                sideEffects: safeParse(drug.adverse_reactions),
-                                warnings: safeParse(drug.contraindications) || safeParse(drug.warnings),
-                                source: '🇺🇸 FDA'
-                            });
-                        }
-                    });
-                }
-            }
-
-            // Priority 3: NIH Processing (Basic Fallback)
-            if (nihRes.status === 'fulfilled' && nihRes.value.ok) {
-                const nihData = await nihRes.value.json();
-                const names = nihData[1];
-                if (names) {
-                    names.forEach(name => {
-                        const brandName = name.toLowerCase();
-                        if (!seenBrands.has(brandName)) {
-                            seenBrands.add(brandName);
-                            uniqueSuggestions.push({
-                                brand: brandName, salt: '', mfg: '',
-                                mappedType: detectMedicineType(name),
-                                price: null, packSize: null, sideEffects: null, warnings: null,
-                                source: '🌐 NIH'
-                            });
-                        }
-                    });
-                }
+            // Priority 3: NIH Processing
+            if (nihData && nihData[1]) {
+                nihData[1].forEach(name => {
+                    const brandName = name.toLowerCase();
+                    if (!seenBrands.has(brandName)) {
+                        seenBrands.add(brandName);
+                        uniqueSuggestions.push({
+                            brand: brandName, salt: '', mfg: '',
+                            mappedType: detectMedicineType(name),
+                            price: null, packSize: null, sideEffects: null, warnings: null,
+                            source: '🌐 NIH'
+                        });
+                    }
+                });
             }
 
             return uniqueSuggestions;
@@ -874,12 +905,20 @@
             }
         });
 
-        // --- FEATURE 2: Global Database Search View ---
+        // --- FEATURE 2: Global Database Search & Sort View ---
         const globalSearchInput = document.getElementById('global-db-search');
         const globalGrid = document.getElementById('global-db-grid');
+        const dbSelector = document.getElementById('db-selector');
+        const sortSelector = document.getElementById('sort-selector');
+
         let globalSearchTimer;
+        let currentGlobalResults = []; 
 
         window.prefillAndOpenModal = (brand, salt, mfg, type) => {
+            editingMedicineId = null;
+            document.querySelector('.modal-title').textContent = 'Add New Medicine';
+            document.getElementById('submit-btn').textContent = 'Add to your list';
+
             medBrandInput.value = brand.replace(/\b\w/g, c => c.toUpperCase());
             medSaltsInput.value = (salt || brand).replace(/\b\w/g, c => c.toUpperCase());
             medMfgInput.value = mfg;
@@ -888,83 +927,123 @@
             openModal();
         };
 
-        globalSearchInput.addEventListener('input', (e) => {
-            clearTimeout(globalSearchTimer);
-            const query = e.target.value.trim();
+        function processAndRenderGlobalSearch() {
+            const query = globalSearchInput.value.trim();
             if (query.length < 2) {
                 globalGrid.innerHTML = '<div id="global-loader">Start typing to search global registries...</div>';
                 return;
             }
             
-            globalGrid.innerHTML = '<div id="global-loader">Searching external databases...</div>';
+            globalGrid.innerHTML = '<div id="global-loader">Searching selected databases...</div>';
             
+            clearTimeout(globalSearchTimer);
             globalSearchTimer = setTimeout(async () => {
-                const results = await fetchExternalDB(query);
+                const dbPref = dbSelector.value;
+                currentGlobalResults = await fetchExternalDB(query, dbPref);
+                applySortAndRender();
+            }, 500);
+        }
+
+        function applySortAndRender() {
+            if (currentGlobalResults.length === 0) {
+                globalGrid.innerHTML = '<div id="global-loader">No records found.</div>';
+                return;
+            }
+
+            let resultsToRender = [...currentGlobalResults];
+            const sortPref = sortSelector.value;
+
+            if (sortPref === 'az') {
+                resultsToRender.sort((a, b) => a.brand.localeCompare(b.brand));
+            } else if (sortPref === 'za') {
+                resultsToRender.sort((a, b) => b.brand.localeCompare(a.brand));
+            }
+
+            globalGrid.innerHTML = '';
+            
+            resultsToRender.forEach((data, index) => {
+                const card = document.createElement('div');
+                card.className = 'med-card';
+                card.style.animationDelay = `${(index % 10) * 0.05}s`; 
+
+                const medIcon = icons[data.mappedType] || icons['pill'];
+                const displayBrand = data.brand || 'Unknown';
+                const displaySalt = (data.salt && data.salt.toLowerCase() !== displayBrand.toLowerCase()) 
+                                    ? `<div class="med-salt-text">${escapeHTML(data.salt)}</div>` : '';
+                const displayMfg = data.mfg ? `<div class="med-mfg-text">${escapeHTML(data.mfg)}</div>` : '';
+                const sourceBadge = `<div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 6px; padding: 2px 6px; background: rgba(255,255,255,0.05); border-radius: 4px; display: inline-block;">Source: ${data.source}</div>`;
                 
-                if (results.length === 0) {
-                    globalGrid.innerHTML = '<div id="global-loader">No records found.</div>';
-                    return;
+                const priceBadge = data.price ? `<span class="badge success">${data.price}</span>` : '';
+                const packBadge = data.packSize ? `<span class="badge" style="background: var(--bg-panel); border: 1px solid var(--border-color);">${escapeHTML(data.packSize)}</span>` : '';
+                
+                let clinicalHtml = '';
+                if (data.warnings) {
+                    const truncWarn = data.warnings.substring(0, 120) + (data.warnings.length > 120 ? '...' : '');
+                    clinicalHtml += `<div style="font-size: 0.8rem; color: var(--warning); margin-top: 0.75rem; background: var(--warning-bg); padding: 8px; border-radius: 8px;"><strong>Avoid If:</strong> ${escapeHTML(truncWarn)}</div>`;
+                }
+                if (data.sideEffects) {
+                    const truncSide = data.sideEffects.substring(0, 120) + (data.sideEffects.length > 120 ? '...' : '');
+                    clinicalHtml += `<div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem; background: rgba(255,255,255,0.05); padding: 8px; border-radius: 8px;"><strong>Side Effects:</strong> ${escapeHTML(truncSide)}</div>`;
                 }
 
-                globalGrid.innerHTML = '';
-                results.forEach((data, index) => {
-                    const card = document.createElement('div');
-                    card.className = 'med-card';
-                    card.style.animationDelay = `${index * 0.05}s`; 
+                const argBrand = escapeHTML(displayBrand).replace(/'/g, "\\'");
+                const argSalt = escapeHTML(data.salt).replace(/'/g, "\\'");
+                const argMfg = escapeHTML(data.mfg).replace(/'/g, "\\'");
+                const argType = data.mappedType;
 
-                    const medIcon = icons[data.mappedType] || icons['pill'];
-                    const displayBrand = data.brand || 'Unknown';
-                    const displaySalt = (data.salt && data.salt.toLowerCase() !== displayBrand.toLowerCase()) 
-                                        ? `<div class="med-salt-text">${escapeHTML(data.salt)}</div>` : '';
-                    const displayMfg = data.mfg ? `<div class="med-mfg-text">${escapeHTML(data.mfg)}</div>` : '';
-                    const sourceBadge = `<div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 6px; padding: 2px 6px; background: rgba(255,255,255,0.05); border-radius: 4px; display: inline-block;">Source: ${data.source}</div>`;
-                    
-                    const priceBadge = data.price ? `<span class="badge success">${data.price}</span>` : '';
-                    const packBadge = data.packSize ? `<span class="badge" style="background: var(--bg-panel); border: 1px solid var(--border-color);">${escapeHTML(data.packSize)}</span>` : '';
-                    
-                    let clinicalHtml = '';
-                    if (data.warnings) {
-                        const truncWarn = data.warnings.substring(0, 120) + (data.warnings.length > 120 ? '...' : '');
-                        clinicalHtml += `<div style="font-size: 0.8rem; color: var(--warning); margin-top: 0.75rem; background: var(--warning-bg); padding: 8px; border-radius: 8px;"><strong>Avoid If:</strong> ${escapeHTML(truncWarn)}</div>`;
-                    }
-                    if (data.sideEffects) {
-                        const truncSide = data.sideEffects.substring(0, 120) + (data.sideEffects.length > 120 ? '...' : '');
-                        clinicalHtml += `<div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem; background: rgba(255,255,255,0.05); padding: 8px; border-radius: 8px;"><strong>Side Effects:</strong> ${escapeHTML(truncSide)}</div>`;
-                    }
-
-                    const argBrand = escapeHTML(displayBrand).replace(/'/g, "\\'");
-                    const argSalt = escapeHTML(data.salt).replace(/'/g, "\\'");
-                    const argMfg = escapeHTML(data.mfg).replace(/'/g, "\\'");
-                    const argType = data.mappedType;
-
-                    card.innerHTML = `
-                        <div class="med-status-strip" style="background-color: #3f3f46;"></div>
-                        <div class="med-header" style="margin-bottom: 0;">
-                            <div class="med-identity">
-                                <div class="med-icon">${medIcon}</div>
-                                <div class="med-titles">
-                                    <div class="med-brand-text">${escapeHTML(displayBrand)}</div>
-                                    ${displaySalt}
-                                    ${displayMfg}
-                                    ${sourceBadge}
-                                </div>
+                card.innerHTML = `
+                    <div class="med-status-strip" style="background-color: #3f3f46;"></div>
+                    <div class="med-header" style="margin-bottom: 0;">
+                        <div class="med-identity">
+                            <div class="med-icon">${medIcon}</div>
+                            <div class="med-titles">
+                                <div class="med-brand-text">${escapeHTML(displayBrand)}</div>
+                                ${displaySalt}
+                                ${displayMfg}
+                                ${sourceBadge}
                             </div>
                         </div>
-                        <div class="med-body" style="margin-top: 1rem;">
-                            <div class="badge-container">${priceBadge}${packBadge}</div>
-                            ${clinicalHtml}
-                        </div>
-                        <div class="med-footer">
-                            <button class="btn-secondary" onclick="prefillAndOpenModal('${argBrand}', '${argSalt}', '${argMfg}', '${argType}')">
-                                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                Add to your list
-                            </button>
-                        </div>
-                    `;
-                    globalGrid.appendChild(card);
-                });
-            }, 500);
-        });
+                    </div>
+                    <div class="med-body" style="margin-top: 1rem;">
+                        <div class="badge-container">${priceBadge}${packBadge}</div>
+                        ${clinicalHtml}
+                    </div>
+                    <div class="med-footer">
+                        <button class="btn-secondary" onclick="prefillAndOpenModal('${argBrand}', '${argSalt}', '${argMfg}', '${argType}')">
+                            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            Add to your list
+                        </button>
+                    </div>
+                `;
+                globalGrid.appendChild(card);
+            });
+        }
+
+        globalSearchInput.addEventListener('input', processAndRenderGlobalSearch);
+        dbSelector.addEventListener('change', processAndRenderGlobalSearch); 
+        sortSelector.addEventListener('change', applySortAndRender);
+
+        // --- Edit Logic ---
+        window.editMedicine = (id) => {
+            const med = localInventory.find(m => m.id === id);
+            if (!med) return;
+
+            editingMedicineId = id;
+
+            document.getElementById('med-brand').value = med.brand || med.name || '';
+            document.getElementById('med-salts').value = med.salts || '';
+            document.getElementById('med-mfg').value = med.manufacturer || '';
+            document.getElementById('med-qty').value = med.quantity || 0;
+            if (med.expiryDate) document.getElementById('med-exp').value = med.expiryDate;
+
+            const targetRadio = document.querySelector(`input[name="med-type"][value="${med.type}"]`);
+            if (targetRadio) targetRadio.checked = true;
+
+            document.querySelector('.modal-title').textContent = 'Edit Medicine';
+            document.getElementById('submit-btn').textContent = 'Save Changes';
+
+            openModal();
+        };
 
         // --- FEATURE 3: Firebase Auth & Inventory Sync ---
         onAuthStateChanged(auth, (user) => {
@@ -1017,7 +1096,6 @@
                 return brand.includes(lowerFilter) || salts.includes(lowerFilter) || type.includes(lowerFilter) || mfg.includes(lowerFilter);
             });
 
-            // SMART SORTING: Sort by Expiry Date (Urgent dates first)
             filtered.sort((a, b) => {
                 const aDays = Math.ceil((new Date(a.expiryDate) - new Date()) / (1000 * 3600 * 24));
                 const bDays = Math.ceil((new Date(b.expiryDate) - new Date()) / (1000 * 3600 * 24));
@@ -1078,6 +1156,11 @@
                         </div>
                     </div>
                     <div class="med-actions">
+                        <button onclick="editMedicine('${id}')" title="Edit">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                        </button>
                         <button onclick="deleteMedicine('${id}')" title="Delete">
                             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                         </button>
@@ -1106,7 +1189,7 @@
         document.getElementById('add-medicine-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submit-btn');
-            btn.textContent = 'Adding...';
+            btn.textContent = editingMedicineId ? 'Saving...' : 'Adding...';
             btn.disabled = true;
 
             const brand = document.getElementById('med-brand').value;
@@ -1117,23 +1200,37 @@
             const type = document.querySelector('input[name="med-type"]:checked').value;
 
             try {
-                const medicinesRef = collection(db, 'users', currentUser.uid, 'medicines');
-                await addDoc(medicinesRef, {
-                    brand: brand,
-                    salts: salts,
-                    manufacturer: mfg,
-                    quantity: parseInt(qty),
-                    expiryDate: exp,
-                    type: type,
-                    createdAt: serverTimestamp()
-                });
-                
+                if (editingMedicineId) {
+                    const medRef = doc(db, 'users', currentUser.uid, 'medicines', editingMedicineId);
+                    await updateDoc(medRef, {
+                        brand: brand,
+                        salts: salts,
+                        manufacturer: mfg,
+                        quantity: parseInt(qty),
+                        expiryDate: exp,
+                        type: type,
+                        updatedAt: serverTimestamp()
+                    });
+                    showToast("Medicine updated successfully!", "success");
+                } else {
+                    const medicinesRef = collection(db, 'users', currentUser.uid, 'medicines');
+                    await addDoc(medicinesRef, {
+                        brand: brand,
+                        salts: salts,
+                        manufacturer: mfg,
+                        quantity: parseInt(qty),
+                        expiryDate: exp,
+                        type: type,
+                        createdAt: serverTimestamp()
+                    });
+                    showToast("Medicine added to inventory!", "success");
+                }
                 closeModal();
-                showToast("Medicine added to inventory!", "success");
             } catch (error) {
-                showToast("Failed to add medicine.", "error");
+                console.error(error);
+                showToast(editingMedicineId ? "Failed to update medicine." : "Failed to add medicine.", "error");
             } finally {
-                btn.textContent = 'Add to your list';
+                btn.textContent = editingMedicineId ? 'Save Changes' : 'Add to your list';
                 btn.disabled = false;
             }
         });
@@ -1152,16 +1249,12 @@
 
         // --- PDF Export Logic ---
         document.getElementById('export-pdf-btn').addEventListener('click', () => {
-            // 1. Check if the inventory has successfully loaded and isn't empty
             if (!localInventory || localInventory.length === 0) {
                 showToast("No inventory data available to export.", "error");
                 return;
             }
             
-            // 2. Cache the current inventory state to browser storage
             localStorage.setItem('qubit_export_cache', JSON.stringify(localInventory));
-            
-            // 3. Reroute the user to the export engine
             window.location.href = 'export.html'; 
         });
 

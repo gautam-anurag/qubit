@@ -573,10 +573,10 @@
                                 </label>
                             </div>
                             <div>
-                                <input type="radio" name="med-type" id="type-patch" value="patch" class="type-radio">
-                                <label for="type-patch" class="type-label">
+                                <input type="radio" name="med-type" id="type-Sachet" value="Sachet" class="type-radio">
+                                <label for="type-Sachet" class="type-label">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><rect x="7" y="7" width="10" height="10" rx="1"></rect></svg>
-                                    Patch
+                                    Sachet
                                 </label>
                             </div>
                         </div>
@@ -640,7 +640,7 @@
             ointment: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12l-2 5H8z"></path><path d="M8 8v11a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V8"></path></svg>`,
             respule: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 2h6v4H9z"></path><path d="M7 6h10v10a4 4 0 0 1-4 4h-2a4 4 0 0 1-4-4V6z"></path></svg>`,
             injection: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 2l-2 2"></path><path d="M14 3l-4 4"></path><path d="M10 7L6 11l-2 6 6-2 4-4"></path><path d="M13 10l-3-3"></path></svg>`,
-            patch: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><rect x="7" y="7" width="10" height="10" rx="1"></rect></svg>`
+            Sachet: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><rect x="7" y="7" width="10" height="10" rx="1"></rect></svg>`
         };
 
         // --- Custom Toast Notifications ---
@@ -697,7 +697,7 @@
             if (desc.includes('cap')) return 'capsule';
             if (desc.includes('respule') || desc.includes('neb') || desc.includes('inhalation solution')) return 'respule';
             if (desc.includes('inj') || desc.includes('vial') || desc.includes('amp') || desc.includes('syr') && !desc.includes('syrup')) return 'injection';
-            if (desc.includes('patch') || desc.includes('transdermal')) return 'patch';
+            if (desc.includes('Sachet') || desc.includes('transdermal')) return 'Sachet';
             if (desc.includes('syr') || desc.includes('sol') || desc.includes('liq') || desc.includes('susp') || desc.includes('elix')) return 'liquid';
             if (desc.includes('drop')) return 'drops';
             if (desc.includes('inh') || desc.includes('aer') || desc.includes('spray')) return 'inhaler';
@@ -715,7 +715,7 @@
                 ointment: 'g',
                 respule: 'Respules',
                 injection: 'Vials',
-                patch: 'Patches'
+                Sachet: 'Sachets'
             };
             return labels[type] || 'Units';
         }

@@ -46,24 +46,42 @@
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-oled);
             color: var(--text-main);
-            height: 100vh; height: 100dvh; 
-            display: flex; overflow: hidden;
+            height: 100vh;
+            height: 100dvh; 
+            display: flex;
+            overflow: hidden;
             -webkit-font-smoothing: antialiased;
             padding-left: env(safe-area-inset-left);
             padding-right: env(safe-area-inset-right);
         }
 
+        /* --- Full Screen App Layout --- */
         .sidebar {
-            width: var(--sidebar-width); background-color: var(--bg-panel);
-            border-right: 1px solid var(--border-color); display: flex; flex-direction: column;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 100; padding-bottom: env(safe-area-inset-bottom);
+            width: var(--sidebar-width);
+            background-color: var(--bg-panel);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
-        .main-content { flex: 1; display: flex; flex-direction: column; height: 100%; position: relative; min-width: 0; }
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+            min-width: 0; 
+        }
 
         .scrollable-area {
-            flex: 1; overflow-y: auto; padding: 2rem;
-            padding-bottom: calc(7rem + env(safe-area-inset-bottom)); scroll-behavior: smooth;
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+            padding-bottom: calc(7rem + env(safe-area-inset-bottom)); 
+            scroll-behavior: smooth;
         }
         
         ::-webkit-scrollbar { width: 6px; }
@@ -71,59 +89,113 @@
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #555; }
 
+        /* --- Sidebar UI --- */
         .brand-header {
-            padding: 1.5rem; padding-top: calc(1.5rem + env(safe-area-inset-top));
-            font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; justify-content: space-between;
-            border-bottom: 1px solid var(--border-color); letter-spacing: -0.02em;
+            padding: 1.5rem;
+            padding-top: calc(1.5rem + env(safe-area-inset-top));
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            letter-spacing: -0.02em;
         }
         .brand-header span { color: var(--primary); }
-        .close-sidebar-btn { background: transparent; border: none; color: var(--text-muted); cursor: pointer; display: none; padding: 0.25rem; }
 
-        .nav-menu { flex: 1; padding: 1.5rem 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; }
+        .close-sidebar-btn {
+            background: transparent; border: none; color: var(--text-muted); cursor: pointer;
+            display: none; align-items: center; justify-content: center; padding: 0.25rem;
+            transition: color 0.2s;
+        }
+        .close-sidebar-btn:hover { color: var(--text-main); }
+
+        .nav-menu {
+            flex: 1;
+            padding: 1.5rem 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
         .nav-item {
-            padding: 0.85rem 1rem; display: flex; align-items: center; gap: 0.85rem; color: var(--text-muted);
-            cursor: pointer; font-weight: 500; transition: all 0.2s ease; border-radius: 8px;
+            padding: 0.85rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-radius: 8px;
         }
         .nav-item:hover { color: var(--text-main); background-color: rgba(255,255,255,0.05); }
-        .nav-item.active { color: var(--primary); background-color: var(--primary-glow); }
+        .nav-item.active {
+            color: var(--primary);
+            background-color: var(--primary-glow);
+        }
 
-        .user-footer { padding: 1.5rem; border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 1rem; }
+        .user-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
         .user-email { font-size: 0.85rem; color: var(--text-muted); word-break: break-all; font-weight: 500; }
         .logout-btn {
             background: transparent; border: 1px solid var(--border-color); color: var(--text-main);
-            padding: 0.75rem; border-radius: 8px; cursor: pointer; font-weight: 500; width: 100%; display: flex; justify-content: center; gap: 0.5rem;
+            padding: 0.75rem; border-radius: 8px; cursor: pointer; transition: all 0.2s;
+            font-weight: 500; width: 100%; display: flex; justify-content: center; align-items: center; gap: 0.5rem;
         }
+        .logout-btn:hover { background: rgba(255,255,255,0.05); border-color: #444; }
 
+        /* --- Top Bar --- */
         .top-bar {
-            display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2rem; 
-            padding-top: calc(1.25rem + env(safe-area-inset-top)); border-bottom: 1px solid var(--border-color); background-color: var(--bg-panel);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1.25rem 2rem; 
+            padding-top: calc(1.25rem + env(safe-area-inset-top)); 
+            border-bottom: 1px solid var(--border-color); background-color: var(--bg-panel);
         }
-        .menu-toggle { background: transparent; border: none; color: var(--text-main); cursor: pointer; display: none; }
+        .menu-toggle {
+            background: transparent; border: none; color: var(--text-main); cursor: pointer;
+            display: none; padding: 0.5rem; margin-left: -0.5rem;
+        }
         .view-title { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.01em; }
 
+        /* --- View Routing --- */
         .view { display: none; animation: fadeIn 0.4s ease-out forwards; opacity: 0; }
         .view.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* --- Toasts System --- */
         .toast-container {
             position: fixed; top: env(safe-area-inset-top, 20px); left: 50%; transform: translateX(-50%);
-            z-index: 9999; display: flex; flex-direction: column; gap: 10px; align-items: center; pointer-events: none; margin-top: 20px;
+            z-index: 9999; display: flex; flex-direction: column; gap: 10px; align-items: center;
+            pointer-events: none; margin-top: 20px;
         }
         .toast {
-            background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.85rem 1.5rem;
-            border-radius: 50px; font-size: 0.9rem; font-weight: 500; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            display: flex; align-items: center; gap: 10px; animation: slideDownFade 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            color: var(--text-main); padding: 0.85rem 1.5rem; border-radius: 50px;
+            font-size: 0.9rem; font-weight: 500; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex; align-items: center; gap: 10px;
+            animation: slideDownFade 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
         .toast.success svg { color: var(--success); }
         .toast.error svg { color: var(--danger); }
-        @keyframes slideDownFade { from { opacity: 0; transform: translateY(-20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes slideDownFade {
+            from { opacity: 0; transform: translateY(-20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
         .toast.hiding { animation: fadeOutUp 0.3s forwards; }
         @keyframes fadeOutUp { to { opacity: 0; transform: translateY(-20px); } }
 
+        /* --- UI Components --- */
         .search-box { position: relative; width: 100%; max-width: 480px; margin-bottom: 2rem; }
         .search-box input {
             width: 100%; padding: 0.85rem 1.25rem 0.85rem 2.75rem; background-color: var(--bg-card);
-            border: 1px solid var(--border-color); border-radius: 12px; color: var(--text-main); font-size: 0.95rem;
+            border: 1px solid var(--border-color); border-radius: 12px; color: var(--text-main);
+            font-size: 0.95rem; transition: border-color 0.2s, box-shadow 0.2s;
         }
         .search-box input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
         .search-box svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
@@ -131,189 +203,190 @@
         .medicine-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; align-items: stretch; }
         
         .med-card {
-            background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem;
-            display: flex; flex-direction: column; position: relative; transition: all 0.3s; overflow: hidden; height: 100%;
+            background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px;
+            padding: 1.5rem; display: flex; flex-direction: column; position: relative; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden; height: 100%;
             opacity: 0; animation: fadeUpCard 0.5s ease-out forwards;
         }
         @keyframes fadeUpCard { to { opacity: 1; transform: translateY(0); } from { opacity: 0; transform: translateY(15px); } }
+        
         .med-card:hover { border-color: #3f3f46; transform: translateY(-3px) !important; box-shadow: 0 12px 24px -10px rgba(0,0,0,0.8); }
 
         .med-status-strip { position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background-color: var(--status-color, var(--text-muted)); }
+
         .med-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem; }
         .med-identity { display: flex; align-items: flex-start; gap: 1rem; flex: 1; min-width: 0; }
+        
         .med-icon { 
             width: 46px; height: 46px; display: flex; align-items: center; justify-content: center;
             background: linear-gradient(135deg, var(--primary-glow), rgba(255,255,255,0.02));
-            border: 1px solid rgba(10, 132, 255, 0.2); border-radius: 10px; color: var(--primary); flex-shrink: 0;
+            border: 1px solid rgba(10, 132, 255, 0.2);
+            border-radius: 10px; color: var(--primary); flex-shrink: 0;
         }
+        
         .med-titles { flex: 1; min-width: 0; }
         .med-brand-text { font-size: 1.15rem; font-weight: 600; text-transform: capitalize; line-height: 1.2; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .med-salt-text { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.35rem; text-transform: capitalize; }
+        .med-salt-text { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.35rem; text-transform: capitalize; line-height: 1.4; }
         
-        .med-actions button { background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 6px; border-radius: 6px; }
+        .med-actions button { background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 6px; border-radius: 6px; transition: all 0.2s; }
         .med-actions button:hover { color: var(--danger); background: var(--danger-bg); }
 
         .med-body { flex: 1; display: flex; flex-direction: column; margin-bottom: 1.25rem; }
         .badge-container { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem; min-height: 26px; }
-        .badge { font-size: 0.75rem; font-weight: 600; padding: 0.35rem 0.6rem; border-radius: 6px; border: 1px solid transparent; }
+        .badge { font-size: 0.75rem; font-weight: 600; padding: 0.35rem 0.6rem; border-radius: 6px; border: 1px solid transparent; letter-spacing: 0.02em; }
         .badge.danger { background-color: var(--danger-bg); color: var(--danger); border-color: rgba(255, 69, 58, 0.2); }
         .badge.warning { background-color: var(--warning-bg); color: var(--warning); border-color: rgba(255, 159, 10, 0.2); }
         .badge.success { background-color: var(--success-bg); color: var(--success); border-color: rgba(50, 215, 75, 0.2); }
         
         .med-details { font-size: 0.9rem; color: var(--text-muted); }
         .med-details strong { color: var(--text-main); font-weight: 600; }
-        .med-footer { margin-top: auto; display: flex; flex-direction: column; gap: 0.5rem; }
+        .med-footer { margin-top: auto; }
 
         .qty-controls {
-            display: flex; align-items: center; justify-content: space-between; background: var(--bg-panel); 
-            border: 1px solid var(--border-color); border-radius: 12px; padding: 0.25rem; width: 100%;
+            display: flex; align-items: center; justify-content: space-between;
+            background: var(--bg-panel); border: 1px solid var(--border-color); 
+            border-radius: 12px; padding: 0.25rem; width: 100%;
         }
         .qty-btn {
             background: transparent; border: none; color: var(--text-main); width: 40px; height: 40px;
             border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1.2rem; 
+            display: flex; align-items: center; justify-content: center; transition: background 0.2s;
         }
         .qty-btn:hover { background: rgba(255,255,255,0.05); }
         .qty-display { font-weight: 600; font-size: 1.05rem; flex: 1; text-align: center; }
 
         .btn-secondary {
             background-color: var(--bg-panel); color: var(--text-main); border: 1px solid var(--border-color);
-            padding: 0.85rem 1rem; border-radius: 12px; font-weight: 600; cursor: pointer; width: 100%;
-            display: flex; justify-content: center; align-items: center; gap: 0.5rem; transition: all 0.2s;
+            padding: 0.85rem 1rem; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+            font-size: 0.95rem; display: flex; justify-content: center; align-items: center; gap: 0.5rem; width: 100%;
         }
         .btn-secondary:hover { background-color: var(--primary-glow); border-color: var(--primary); color: var(--primary); }
-        
-        .btn-ai-insights {
-            background-color: rgba(168, 85, 247, 0.12); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3);
-            padding: 0.6rem 0.85rem; border-radius: 10px; font-weight: 600; font-size: 0.85rem; cursor: pointer;
-            width: 100%; display: flex; justify-content: center; align-items: center; gap: 0.4rem; transition: all 0.2s;
-        }
-        .btn-ai-insights:hover { background-color: rgba(168, 85, 247, 0.25); border-color: #c084fc; }
-
-        .btn-action {
-            background-color: var(--primary); color: white; border: none;
-            padding: 0.85rem 1rem; border-radius: 12px; font-weight: 600; cursor: pointer; width: 100%;
-            display: flex; justify-content: center; align-items: center; gap: 0.5rem; transition: all 0.2s;
-        }
-        .btn-action:hover { background-color: var(--primary-hover); }
 
         #loader, #global-loader { text-align: center; color: var(--text-muted); padding: 2rem; grid-column: 1 / -1; font-weight: 500; }
 
+        /* --- Floating Action Button --- */
         .fab {
-            position: absolute; right: 2rem; bottom: calc(2rem + env(safe-area-inset-bottom)); 
-            width: 64px; height: 64px; border-radius: 50%; background-color: var(--primary); color: white;
+            position: absolute; right: 2rem;
+            bottom: calc(2rem + env(safe-area-inset-bottom)); 
+            width: 64px; height: 64px; border-radius: 50%;
+            background-color: var(--primary); color: white;
             border: none; cursor: pointer; display: flex; justify-content: center; align-items: center;
-            box-shadow: 0 10px 30px rgba(10, 132, 255, 0.4); z-index: 50; transition: transform 0.2s;
+            box-shadow: 0 10px 30px rgba(10, 132, 255, 0.4);
+            z-index: 50; transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s;
         }
-        .fab:hover { background-color: var(--primary-hover); transform: scale(1.05) translateY(-2px); }
+        .fab:hover { background-color: var(--primary-hover); transform: scale(1.05) translateY(-2px); box-shadow: 0 15px 35px rgba(10, 132, 255, 0.5); }
+        .fab:active { transform: scale(0.95); }
 
-        .schedule-chip {
-            background: var(--bg-panel); border: 1px solid var(--border-color); padding: 8px 14px;
-            border-radius: 20px; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s;
-            color: var(--text-muted); display: inline-flex; align-items: center; gap: 6px; user-select: none;
-        }
-        .schedule-chip input { display: none; }
-        .schedule-chip:has(input:checked) { background: var(--primary-glow); border-color: var(--primary); color: var(--primary); }
-
-        .timeline { position: relative; max-width: 600px; margin-top: 1rem; padding-bottom: 2rem; }
-        .timeline::before { content: ''; position: absolute; left: 16px; top: 0; bottom: 0; width: 2px; background: var(--border-color); }
-        .timeline-item { position: relative; padding-left: 48px; margin-bottom: 1.75rem; opacity: 0; animation: fadeUpCard 0.4s ease-out forwards; }
-        .timeline-dot {
-            position: absolute; left: 11px; top: 4px; width: 12px; height: 12px; border-radius: 50%;
-            background: var(--primary); box-shadow: 0 0 0 4px var(--bg-oled);
-        }
-        .timeline-content { background: var(--bg-card); border: 1px solid var(--border-color); padding: 1rem; border-radius: 12px; }
-        .timeline-time { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem; font-weight: 600; text-transform: uppercase; }
-        .timeline-title { font-weight: 600; font-size: 1.05rem; }
-        
-        .section-header { font-size: 1.15rem; font-weight: 700; color: var(--text-muted); margin-bottom: 1rem; margin-top: 2rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); }
-        .section-header:first-child { margin-top: 0; }
-
-        /* Clinical Insights Styling */
-        .ai-salt-card {
-            background-color: var(--bg-panel); border: 1px solid var(--border-color);
-            border-radius: 12px; padding: 1.25rem; margin-bottom: 1.25rem;
-        }
-        .ai-salt-header {
-            font-size: 1.05rem; font-weight: 700; color: var(--primary);
-            margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;
-        }
-        .ai-section-title {
-            font-size: 0.85rem; font-weight: 600; color: var(--text-muted);
-            text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.85rem; margin-bottom: 0.4rem;
-        }
-        .ai-box {
-            font-size: 0.88rem; line-height: 1.5; padding: 0.75rem 1rem; border-radius: 8px;
-        }
-        .ai-box.warning { background: var(--warning-bg); color: var(--warning); border: 1px solid rgba(255, 159, 10, 0.2); }
-        .ai-box.side-effects { background: rgba(255, 255, 255, 0.04); color: var(--text-main); border: 1px solid var(--border-color); }
-
-        /* --- Modal --- */
+        /* --- Edge-to-Edge Modal --- */
         .modal-overlay {
-            position: fixed; inset: 0; background-color: var(--overlay); backdrop-filter: blur(8px);
-            display: flex; justify-content: center; align-items: flex-end; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+            position: fixed; inset: 0; background-color: var(--overlay);
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            display: flex; justify-content: center; align-items: flex-end; z-index: 1000;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
         }
         .modal-overlay.open { opacity: 1; pointer-events: auto; }
+        
         .modal-content {
-            background-color: var(--bg-card); width: 100%; height: 100vh; height: 100dvh; overflow-y: auto;
-            transform: translateY(100%); transition: transform 0.4s; padding-bottom: env(safe-area-inset-bottom);
+            background-color: var(--bg-card); width: 100%; height: 100vh; height: 100dvh;
+            overflow-y: auto; display: flex; flex-direction: column;
+            transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            padding-bottom: env(safe-area-inset-bottom);
         }
         .modal-overlay.open .modal-content { transform: translateY(0); }
+
         .modal-header {
-            display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 2rem;
-            border-bottom: 1px solid var(--border-color); position: sticky; top: 0; background-color: rgba(18, 18, 18, 0.95); z-index: 10;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1.5rem 2rem; border-bottom: 1px solid var(--border-color);
+            position: sticky; top: 0; background-color: rgba(18, 18, 18, 0.95); 
+            backdrop-filter: blur(12px); z-index: 10;
+            padding-top: calc(1.5rem + env(safe-area-inset-top));
         }
         .modal-title { font-size: 1.25rem; font-weight: 700; }
-        .close-modal-btn { background: var(--bg-panel); border: 1px solid var(--border-color); color: var(--text-main); width: 38px; height: 38px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; }
-        .modal-body { padding: 2rem; }
+        .close-modal-btn {
+            background: var(--bg-panel); border: 1px solid var(--border-color);
+            color: var(--text-main); width: 38px; height: 38px; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center; cursor: pointer; transition: all 0.2s;
+        }
+        .close-modal-btn:hover { background: #333; }
+
+        .modal-body { padding: 2rem; padding-bottom: calc(4rem + env(safe-area-inset-bottom)); }
 
         @media(min-width: 640px) {
             .modal-overlay { align-items: center; }
-            .modal-content { height: auto; max-height: 90vh; width: 580px; border-radius: 20px; border: 1px solid var(--border-color); transform: translateY(30px) scale(0.95); padding-bottom: 0; }
-            .modal-header { border-top-left-radius: 20px; border-top-right-radius: 20px; }
+            .modal-content {
+                height: auto; max-height: 90vh; width: 550px;
+                border-radius: 20px; border: 1px solid var(--border-color);
+                transform: translateY(30px) scale(0.95); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 1);
+                padding-bottom: 0; 
+            }
+            .modal-header { padding-top: 1.5rem; border-top-left-radius: 20px; border-top-right-radius: 20px; }
             .modal-overlay.open .modal-content { transform: translateY(0) scale(1); }
+            .modal-body { padding-bottom: 3rem; } 
         }
 
+        /* --- Forms inside Modal --- */
         .form-group { margin-bottom: 1.5rem; position: relative; }
         .form-group label { display: block; font-size: 0.85rem; font-weight: 500; color: var(--text-muted); margin-bottom: 0.6rem; }
-        .form-group input:not([type="checkbox"]):not([type="radio"]) {
+        .form-group input {
             width: 100%; padding: 0.85rem 1.25rem; background-color: var(--bg-panel);
-            border: 1px solid var(--border-color); border-radius: 12px; color: var(--text-main); font-size: 16px; 
+            border: 1px solid var(--border-color); border-radius: 12px; color: var(--text-main);
+            font-size: 16px; font-family: inherit; transition: all 0.2s;
         }
         .form-group input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
         
         .autocomplete-dropdown {
             position: absolute; top: 100%; left: 0; width: 100%; background-color: var(--bg-card);
-            border: 1px solid var(--border-color); border-radius: 12px; margin-top: 6px; max-height: 250px; overflow-y: auto; z-index: 100;
+            border: 1px solid var(--border-color); border-radius: 12px; margin-top: 6px;
+            max-height: 250px; overflow-y: auto; z-index: 100; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.8);
         }
         .autocomplete-dropdown.hidden { display: none; }
-        .autocomplete-item { padding: 1rem; cursor: pointer; border-bottom: 1px solid var(--border-color); }
-        .autocomplete-item:hover { background-color: var(--primary); color: white; }
+        .autocomplete-item {
+            padding: 1rem; cursor: pointer; font-size: 0.95rem; display: flex; flex-direction: column;
+            border-bottom: 1px solid var(--border-color); transition: background-color 0.15s;
+        }
+        .autocomplete-item:last-child { border-bottom: none; }
+        .autocomplete-item:hover { background-color: var(--primary); color: white; border-color: var(--primary); }
+        
         .ac-header { display: flex; justify-content: space-between; align-items: center; }
         .ac-brand { font-weight: 600; text-transform: capitalize; }
         .ac-type { font-size: 0.7rem; font-weight: 600; padding: 3px 8px; background: rgba(255,255,255,0.15); border-radius: 6px; text-transform: uppercase; }
-        
+        .ac-salt { font-size: 0.8rem; color: var(--text-muted); text-transform: capitalize; margin-top: 4px; }
+        .ac-mfg { font-size: 0.75rem; color: #a1a1aa; margin-top: 4px; }
+        .autocomplete-item:hover .ac-salt, .autocomplete-item:hover .ac-mfg { color: rgba(255,255,255,0.9); }
+
         .type-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
         .type-radio { display: none; }
         .type-label {
-            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.85rem;
-            background-color: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 12px; cursor: pointer; color: var(--text-muted); font-size: 0.8rem;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 0.5rem; padding: 0.85rem; background-color: var(--bg-panel); border: 1px solid var(--border-color);
+            border-radius: 12px; cursor: pointer; transition: all 0.2s; color: var(--text-muted); font-size: 0.8rem; font-weight: 500;
         }
+        .type-label:hover { border-color: #555; color: var(--text-main); }
         .type-radio:checked + .type-label { border-color: var(--primary); background-color: var(--primary-glow); color: var(--primary); }
 
         .btn-primary {
-            width: 100%; background-color: var(--primary); color: white; border: none; padding: 1.1rem;
-            border-radius: 12px; font-weight: 600; font-size: 1.05rem; cursor: pointer; margin-top: 1rem;
+            width: 100%; background-color: var(--primary); color: white; border: none;
+            padding: 1.1rem; border-radius: 12px; font-weight: 600; font-size: 1.05rem; cursor: pointer; transition: background-color 0.2s;
+            margin-top: 1rem; box-shadow: 0 4px 12px rgba(10, 132, 255, 0.3);
         }
         .btn-primary:hover { background-color: var(--primary-hover); }
 
+        /* --- Edge-to-Edge Mobile Sidebar Rules --- */
         .mobile-overlay { position: fixed; inset: 0; background-color: var(--overlay); z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .mobile-overlay.open { opacity: 1; pointer-events: auto; }
 
         @media(max-width: 768px) {
-            .sidebar { position: fixed; height: 100vh; height: 100dvh; width: 100vw; transform: translateX(-100%); z-index: 1001; border-right: none; }
+            .sidebar { 
+                position: fixed; height: 100vh; height: 100dvh; width: 100vw; 
+                transform: translateX(-100%); z-index: 1001; border-right: none;
+            }
             .sidebar.open { transform: translateX(0); }
+            
             .close-sidebar-btn { display: flex; }
             .menu-toggle { display: block; }
+            .top-bar { padding: 1rem 1.5rem; padding-top: calc(1rem + env(safe-area-inset-top)); }
+            .scrollable-area { padding: 1.5rem; padding-bottom: calc(7rem + env(safe-area-inset-bottom)); }
         }
     </style>
 </head>
@@ -325,30 +398,18 @@
     <nav class="sidebar" id="sidebar">
         <div class="brand-header">
             <div>Qubit <span>| Meds</span></div>
-            <button class="close-sidebar-btn" id="close-sidebar-btn">
+            <button class="close-sidebar-btn" id="close-sidebar-btn" aria-label="Close Menu">
                 <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
         <div class="nav-menu">
-            <div class="nav-item active" data-target="regimen-view">
-                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                Daily Regimen
-            </div>
-            <div class="nav-item" data-target="inventory-view">
+            <div class="nav-item active" data-target="inventory-view">
                 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
-                Inventory Stock
-            </div>
-            <div class="nav-item" data-target="restock-view">
-                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-                Restock List
-            </div>
-            <div class="nav-item" data-target="history-view">
-                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                Dose History
+                Available Medicines
             </div>
             <div class="nav-item" data-target="database-view">
                 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                Global Database
+                Medicines Database
             </div>
         </div>
         <div class="user-footer">
@@ -362,94 +423,55 @@
 
     <main class="main-content">
         <header class="top-bar">
-            <button class="menu-toggle" id="menu-toggle">
+            <button class="menu-toggle" id="menu-toggle" aria-label="Open Menu">
                 <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
             </button>
-            <div class="view-title" id="view-title">Daily Regimen</div>
+            <div class="view-title" id="view-title">Available Medicines</div>
             <div style="width: 24px;"></div> 
         </header>
 
         <div class="scrollable-area">
             
-            <!-- VIEW 1: DAILY REGIMEN -->
-            <div id="regimen-view" class="view active">
-                <div style="margin-bottom: 2.5rem; max-width: 600px;">
-                    <p style="color: var(--text-muted); font-size: 1rem; line-height: 1.6;">
-                        Your prescribed daily schedule. Tap "Take Dose" to log the event and automatically update your inventory stock.
-                    </p>
-                </div>
-                <div id="regimen-container">
-                    <div id="loader">Syncing schedule...</div>
-                </div>
-            </div>
-
-            <!-- VIEW 2: INVENTORY STOCK -->
-            <div id="inventory-view" class="view">
+            <div id="inventory-view" class="view active">
                 <div class="search-box">
                     <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    <input type="text" id="inventory-search" placeholder="Search your stock by brand or salts...">
+                    <input type="text" id="inventory-search" placeholder="Search your stock by brand, salt, or type...">
                 </div>
                 <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem; font-weight: 500;" id="inventory-count">Loading...</div>
-                <div class="medicine-grid" id="medicine-grid"></div>
-            </div>
-
-            <!-- VIEW 3: RESTOCK & SHOPPING LIST -->
-            <div id="restock-view" class="view">
-                <div style="margin-bottom: 2rem; max-width: 600px; display: flex; flex-direction: column; gap: 1rem;">
-                    <p style="color: var(--text-muted); font-size: 1rem; line-height: 1.6;">
-                        Medicines that are low on stock (< 5 units) or near expiration date (&le; 30 days).
-                    </p>
-                    <button class="btn-action" id="copy-restock-btn" style="max-width: 260px;">
-                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                        Copy Restock List
-                    </button>
-                </div>
-                <div class="medicine-grid" id="restock-grid">
-                    <div id="loader">Analyzing stock levels...</div>
+                
+                <div class="medicine-grid" id="medicine-grid">
+                    <div id="loader">Syncing with Qubit Cloud...</div>
                 </div>
             </div>
 
-            <!-- VIEW 4: DOSE HISTORY -->
-            <div id="history-view" class="view">
-                <div style="margin-bottom: 1.5rem; max-width: 600px;">
-                    <p style="color: var(--text-muted); font-size: 1rem; line-height: 1.6;">
-                        A chronological log of every dose taken.
-                    </p>
-                </div>
-                <div class="timeline" id="history-timeline">
-                    <div id="loader">Loading history...</div>
-                </div>
-            </div>
-
-            <!-- VIEW 5: DATABASE -->
             <div id="database-view" class="view">
                 <div style="margin-bottom: 2.5rem; max-width: 600px;">
                     <p style="color: var(--text-muted); margin-bottom: 1.5rem; font-size: 1rem; line-height: 1.6;">
-                        Search global registries to identify medicines and import them to stock.
+                        Search the global FDA & NIH registries to identify medicines, view formulations, and instantly import them to your Qubit stock.
                     </p>
                     <div class="search-box" style="max-width: 100%; margin-bottom: 0;">
                         <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        <input type="text" id="global-db-search" placeholder="Search global registry...">
+                        <input type="text" id="global-db-search" placeholder="Search global registry (e.g., Aspirin)...">
                     </div>
                 </div>
+                
                 <div class="medicine-grid" id="global-db-grid">
-                    <div id="global-loader">Start typing...</div>
+                    <div id="global-loader">Start typing to search global registries...</div>
                 </div>
             </div>
 
         </div>
 
-        <button class="fab" id="open-modal-btn">
+        <button class="fab" id="open-modal-btn" aria-label="Add Medicine">
             <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
         </button>
     </main>
 
-    <!-- ADD MEDICINE MODAL -->
     <div class="modal-overlay" id="add-modal">
         <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-title">Add New Medicine</div>
-                <button class="close-modal-btn" id="close-modal-btn">
+                <button class="close-modal-btn" id="close-modal-btn" aria-label="Close">
                     <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
             </div>
@@ -457,39 +479,78 @@
             <div class="modal-body">
                 <form id="add-medicine-form" autocomplete="off">
                     <div class="form-group">
-                        <label>Trade / Generic Name</label>
-                        <input type="text" id="med-brand" required>
+                        <label for="med-brand">Trade / Generic Name</label>
+                        <input type="text" id="med-brand" placeholder="e.g., Azithromycin or Xyzal" required>
                         <div id="autocomplete-results" class="autocomplete-dropdown hidden"></div>
                     </div>
 
                     <div class="form-group">
                         <label>Medicine Type</label>
                         <div class="type-grid">
-                            <div><input type="radio" name="med-type" id="type-pill" value="pill" class="type-radio" checked><label for="type-pill" class="type-label">Tablet</label></div>
-                            <div><input type="radio" name="med-type" id="type-capsule" value="capsule" class="type-radio"><label for="type-capsule" class="type-label">Capsule</label></div>
-                            <div><input type="radio" name="med-type" id="type-liquid" value="liquid" class="type-radio"><label for="type-liquid" class="type-label">Syrup</label></div>
-                            <div><input type="radio" name="med-type" id="type-drops" value="drops" class="type-radio"><label for="type-drops" class="type-label">Drops</label></div>
-                            <div><input type="radio" name="med-type" id="type-inhaler" value="inhaler" class="type-radio"><label for="type-inhaler" class="type-label">Inhaler</label></div>
-                            <div><input type="radio" name="med-type" id="type-ointment" value="ointment" class="type-radio"><label for="type-ointment" class="type-label">Cream</label></div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Daily Schedule (Optional)</label>
-                        <div class="badge-container" id="schedule-selector" style="gap: 10px;">
-                            <label class="schedule-chip"><input type="checkbox" value="Morning"> Morning</label>
-                            <label class="schedule-chip"><input type="checkbox" value="Afternoon"> Afternoon</label>
-                            <label class="schedule-chip"><input type="checkbox" value="Evening"> Evening</label>
-                            <label class="schedule-chip"><input type="checkbox" value="Night"> Night</label>
+                            <div>
+                                <input type="radio" name="med-type" id="type-pill" value="pill" class="type-radio" checked>
+                                <label for="type-pill" class="type-label">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="7"></circle><line x1="7.05" y1="12" x2="16.95" y2="12"></line></svg>
+                                    Tablet
+                                </label>
+                            </div>
+                            <div>
+                                <input type="radio" name="med-type" id="type-capsule" value="capsule" class="type-radio">
+                                <label for="type-capsule" class="type-label">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="10" width="14" height="6" rx="3" transform="rotate(-45 12 13)"></rect><path d="M7 10l5 5"></path></svg>
+                                    Capsule
+                                </label>
+                            </div>
+                            <div>
+                                <input type="radio" name="med-type" id="type-liquid" value="liquid" class="type-radio">
+                                <label for="type-liquid" class="type-label">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v3h4V2z"></path><rect x="7" y="5" width="10" height="17" rx="3"></rect><path d="M7 12h10"></path></svg>
+                                    Syrup
+                                </label>
+                            </div>
+                            <div>
+                                <input type="radio" name="med-type" id="type-drops" value="drops" class="type-radio">
+                                <label for="type-drops" class="type-label">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"></path></svg>
+                                    Drops
+                                </label>
+                            </div>
+                            <div>
+                                <input type="radio" name="med-type" id="type-inhaler" value="inhaler" class="type-radio">
+                                <label for="type-inhaler" class="type-label">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 21v-5a3 3 0 0 1 3-3h1"></path><path d="M16 13h2a3 3 0 0 1 3 3v5"></path><path d="M16 3h-5a3 3 0 0 0-3 3v7h8V6a3 3 0 0 0-3-3z"></path></svg>
+                                    Inhaler
+                                </label>
+                            </div>
+                            <div>
+                                <input type="radio" name="med-type" id="type-ointment" value="ointment" class="type-radio">
+                                <label for="type-ointment" class="type-label">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12l-2 5H8z"></path><path d="M8 8v11a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V8"></path></svg>
+                                    Cream
+                                </label>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="form-group"><label>Formulation / Salts</label><input type="text" id="med-salts"></div>
-                    <div class="form-group"><label>Manufacturer</label><input type="text" id="med-mfg"></div>
+                    <div class="form-group">
+                        <label for="med-salts">Formulation / Salts</label>
+                        <input type="text" id="med-salts" placeholder="e.g., Azithromycin">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="med-mfg">Manufacturer</label>
+                        <input type="text" id="med-mfg" placeholder="e.g., Pfizer">
+                    </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-                        <div class="form-group"><label>Current Qty</label><input type="number" id="med-qty" min="0" required></div>
-                        <div class="form-group"><label>Expiry Date</label><input type="date" id="med-exp" required></div>
+                        <div class="form-group">
+                            <label for="med-qty">Current Qty</label>
+                            <input type="number" id="med-qty" placeholder="30" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="med-exp">Expiry Date</label>
+                            <input type="date" id="med-exp" required>
+                        </div>
                     </div>
                     
                     <button type="submit" class="btn-primary" id="submit-btn">Add to Stock</button>
@@ -498,31 +559,10 @@
         </div>
     </div>
 
-    <!-- AI CLINICAL INSIGHTS MODAL -->
-    <div class="modal-overlay" id="ai-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div>
-                    <div class="modal-title" style="color: #c084fc; display: flex; align-items: center; gap: 0.5rem;">
-                        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                        Clinical AI Insights
-                    </div>
-                    <div id="ai-modal-subtitle" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">Analyzing composition...</div>
-                </div>
-                <button class="close-modal-btn" id="close-ai-modal-btn">
-                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                </button>
-            </div>
-            <div class="modal-body" id="ai-modal-body">
-                <div id="loader">Gathering salt-level clinical data...</div>
-            </div>
-        </div>
-    </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, initializeFirestore, persistentLocalCache, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, serverTimestamp, query, orderBy, limit, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, initializeFirestore, persistentLocalCache, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDdavvZjFC1xo3reedoJyecBJCFXyo7vIM",
@@ -539,7 +579,6 @@
 
         let currentUser = null;
         let localInventory = []; 
-        let localLogs = [];
 
         const icons = {
             pill: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7"></circle><line x1="7.05" y1="12" x2="16.95" y2="12"></line></svg>`,
@@ -550,6 +589,7 @@
             ointment: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l-2 5H8z"></path><path d="M8 8v11a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V8"></path></svg>`
         };
 
+        // --- Custom Toast Notifications ---
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -559,16 +599,29 @@
                 : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
             toast.innerHTML = `${iconHtml} <span>${message}</span>`;
             container.appendChild(toast);
-            setTimeout(() => { toast.classList.add('hiding'); setTimeout(() => toast.remove(), 300); }, 3000);
+            setTimeout(() => {
+                toast.classList.add('hiding');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
         }
 
-        const escapeHTML = (str) => { const div = document.createElement('div'); div.textContent = str; return div.innerHTML; };
-
-        // --- Navigation ---
+        // --- Sidebar & Routing Logic ---
         const navItems = document.querySelectorAll('.nav-item');
         const views = document.querySelectorAll('.view');
         const viewTitle = document.getElementById('view-title');
-        
+        const sidebar = document.getElementById('sidebar');
+        const mobileOverlay = document.getElementById('mobile-overlay');
+        const menuToggle = document.getElementById('menu-toggle');
+        const closeSidebarBtn = document.getElementById('close-sidebar-btn');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('open');
+            mobileOverlay.classList.toggle('open');
+        }
+        menuToggle.addEventListener('click', toggleSidebar);
+        closeSidebarBtn.addEventListener('click', toggleSidebar);
+        mobileOverlay.addEventListener('click', toggleSidebar);
+
         navItems.forEach(item => {
             item.addEventListener('click', () => {
                 navItems.forEach(nav => nav.classList.remove('active'));
@@ -579,441 +632,465 @@
                     if (view.id === target) view.classList.add('active');
                     else view.classList.remove('active');
                 });
-                if (window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('open');
+                if (window.innerWidth <= 768) toggleSidebar();
             });
         });
 
-        // Modals
-        const addModal = document.getElementById('add-modal');
-        const aiModal = document.getElementById('ai-modal');
+        // --- Modal Logic ---
+        const modal = document.getElementById('add-modal');
+        const openModal = () => modal.classList.add('open');
+        const closeModal = () => {
+            modal.classList.remove('open');
+            document.getElementById('autocomplete-results').classList.add('hidden');
+        };
 
         document.getElementById('open-modal-btn').addEventListener('click', () => {
             document.getElementById('add-medicine-form').reset();
-            document.querySelectorAll('.schedule-chip input').forEach(cb => cb.checked = false);
-            addModal.classList.add('open');
+            openModal();
         });
-        document.getElementById('close-modal-btn').addEventListener('click', () => addModal.classList.remove('open'));
-        document.getElementById('close-ai-modal-btn').addEventListener('click', () => aiModal.classList.remove('open'));
+        document.getElementById('close-modal-btn').addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
 
-        // --- Core Data Listener ---
+        // --- Utility Functions ---
+        function detectMedicineType(description) {
+            if (!description) return 'pill';
+            const desc = description.toLowerCase();
+            if (desc.includes('cap')) return 'capsule';
+            if (desc.includes('syr') || desc.includes('sol') || desc.includes('liq') || desc.includes('susp') || desc.includes('elix')) return 'liquid';
+            if (desc.includes('drop')) return 'drops';
+            if (desc.includes('inh') || desc.includes('aer') || desc.includes('spray')) return 'inhaler';
+            if (desc.includes('oint') || desc.includes('crea') || desc.includes('gel') || desc.includes('lot')) return 'ointment';
+            return 'pill';
+        }
+
+        const safeParse = (field) => {
+            if (!field) return '';
+            return Array.isArray(field) ? field.join(' ') : String(field);
+        };
+
+        function escapeHTML(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // --- 3-Tier Prioritized Fetch Logic (Upgraded for Max Data) ---
+        let indianMedDatabase = null;
+        let isFetchingDB = false;
+
+        async function fetchExternalDB(searchQuery) {
+            const lowerQuery = searchQuery.toLowerCase();
+            const uniqueSuggestions = [];
+            const seenBrands = new Set(); 
+
+            // PRIORITY 1: Indian Medicine Database (Price, Salts, Packaging)
+            if (!indianMedDatabase) {
+                if (!isFetchingDB) {
+                    isFetchingDB = true;
+                    try {
+                        const response = await fetch('https://raw.githubusercontent.com/junioralive/Indian-Medicine-Dataset/main/DATA/indian_medicine_data.json');
+                        if (response.ok) indianMedDatabase = await response.json();
+                    } catch (error) {
+                        console.error("Failed to load Indian DB:", error);
+                    }
+                    isFetchingDB = false;
+                }
+            }
+
+            if (indianMedDatabase) {
+                const indianResults = indianMedDatabase
+                    .filter(med => {
+                        const nameMatch = med.name && med.name.toLowerCase().includes(lowerQuery);
+                        const saltMatch = med.short_composition1 && med.short_composition1.toLowerCase().includes(lowerQuery);
+                        return nameMatch || saltMatch;
+                    })
+                    .slice(0, 15); 
+
+                indianResults.forEach(drug => {
+                    const brandName = escapeHTML(drug.name || '').toLowerCase();
+                    const mfgName = escapeHTML(drug.manufacturer_name || '');
+                    const key = brandName + mfgName;
+
+                    if (!seenBrands.has(key)) {
+                        seenBrands.add(key);
+                        let salts = drug.short_composition1 || '';
+                        if (drug.short_composition2) salts += ' + ' + drug.short_composition2;
+                        const typeString = drug.pack_size_label || drug.type;
+
+                        uniqueSuggestions.push({
+                            brand: brandName,
+                            salt: salts.toLowerCase(),
+                            mfg: mfgName,
+                            mappedType: detectMedicineType(typeString),
+                            price: drug['price(₹)'] ? `₹${drug['price(₹)']}` : null,
+                            packSize: drug.pack_size_label || null,
+                            sideEffects: null, 
+                            warnings: null,
+                            source: '🇮🇳 IND'
+                        });
+                    }
+                });
+            }
+
+            // PRIORITY 2 & 3: FDA Label API (Clinical Data) and NIH 
+            const [fdaRes, nihRes] = await Promise.allSettled([
+                fetch(`https://api.fda.gov/drug/label.json?search=openfda.brand_name:"${searchQuery}*"&limit=5`),
+                fetch(`https://clinicaltables.nlm.nih.gov/api/rxterms/v3/search?terms=${searchQuery}`)
+            ]);
+
+            // Priority 2: FDA Processing (Extracting Side Effects & Warnings)
+            if (fdaRes.status === 'fulfilled' && fdaRes.value.ok) {
+                const fdaData = await fdaRes.value.json();
+                if (fdaData.results) {
+                    fdaData.results.forEach(drug => {
+                        const openfda = drug.openfda || {};
+                        const brandName = safeParse(openfda.brand_name).toLowerCase();
+                        const mfgName = safeParse(openfda.manufacturer_name);
+                        const key = brandName + mfgName;
+
+                        if (brandName && !seenBrands.has(key)) {
+                            seenBrands.add(key);
+                            uniqueSuggestions.push({
+                                brand: brandName,
+                                salt: safeParse(openfda.generic_name).toLowerCase(),
+                                mfg: mfgName,
+                                mappedType: detectMedicineType(safeParse(openfda.route)),
+                                price: null, 
+                                packSize: null,
+                                sideEffects: safeParse(drug.adverse_reactions),
+                                warnings: safeParse(drug.contraindications) || safeParse(drug.warnings),
+                                source: '🇺🇸 FDA'
+                            });
+                        }
+                    });
+                }
+            }
+
+            // Priority 3: NIH Processing (Basic Fallback)
+            if (nihRes.status === 'fulfilled' && nihRes.value.ok) {
+                const nihData = await nihRes.value.json();
+                const names = nihData[1];
+                if (names) {
+                    names.forEach(name => {
+                        const brandName = name.toLowerCase();
+                        if (!seenBrands.has(brandName)) {
+                            seenBrands.add(brandName);
+                            uniqueSuggestions.push({
+                                brand: brandName, salt: '', mfg: '',
+                                mappedType: detectMedicineType(name),
+                                price: null, packSize: null, sideEffects: null, warnings: null,
+                                source: '🌐 NIH'
+                            });
+                        }
+                    });
+                }
+            }
+
+            return uniqueSuggestions;
+        }
+
+        // --- FEATURE 1: Add Modal Autocomplete ---
+        const medBrandInput = document.getElementById('med-brand');
+        const medSaltsInput = document.getElementById('med-salts');
+        const medMfgInput = document.getElementById('med-mfg');
+        const autocompleteResults = document.getElementById('autocomplete-results');
+        let autocompleteTimer;
+
+        medBrandInput.addEventListener('input', (e) => {
+            clearTimeout(autocompleteTimer);
+            const query = e.target.value.trim();
+            if (query.length < 2) {
+                autocompleteResults.innerHTML = '';
+                autocompleteResults.classList.add('hidden');
+                return;
+            }
+            autocompleteTimer = setTimeout(async () => {
+                const results = await fetchExternalDB(query);
+                renderAutocomplete(results);
+            }, 300);
+        });
+
+        function renderAutocomplete(uniqueSuggestions) {
+            if (uniqueSuggestions.length === 0) {
+                autocompleteResults.classList.add('hidden');
+                return;
+            }
+            autocompleteResults.innerHTML = '';
+            uniqueSuggestions.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'autocomplete-item';
+                
+                const mfgDisplay = item.mfg ? `<div class="ac-mfg">Mfg: ${item.mfg}</div>` : '';
+                const saltDisplay = item.salt ? `<div class="ac-salt">${item.salt}</div>` : '';
+
+                div.innerHTML = `
+                    <div class="ac-header">
+                        <span class="ac-brand">${item.brand}</span>
+                        <div>
+                            <span style="font-size: 0.65rem; color: var(--text-muted); margin-right: 6px;">${item.source}</span>
+                            <span class="ac-type">${item.mappedType}</span>
+                        </div>
+                    </div>
+                    ${saltDisplay}
+                    ${mfgDisplay}
+                `;
+                
+                div.onclick = () => {
+                    medBrandInput.value = item.brand.replace(/\b\w/g, c => c.toUpperCase());
+                    const finalSalt = item.salt || item.brand;
+                    medSaltsInput.value = finalSalt.replace(/\b\w/g, c => c.toUpperCase());
+                    if(item.mfg) medMfgInput.value = item.mfg;
+                    
+                    const targetRadio = document.querySelector(`input[value="${item.mappedType}"]`);
+                    if(targetRadio) targetRadio.checked = true;
+
+                    autocompleteResults.classList.add('hidden');
+                };
+                autocompleteResults.appendChild(div);
+            });
+            autocompleteResults.classList.remove('hidden');
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!medBrandInput.contains(e.target) && !autocompleteResults.contains(e.target)) {
+                autocompleteResults.classList.add('hidden');
+            }
+        });
+
+        // --- FEATURE 2: Global Database Search View ---
+        const globalSearchInput = document.getElementById('global-db-search');
+        const globalGrid = document.getElementById('global-db-grid');
+        let globalSearchTimer;
+
+        window.prefillAndOpenModal = (brand, salt, mfg, type) => {
+            medBrandInput.value = brand.replace(/\b\w/g, c => c.toUpperCase());
+            medSaltsInput.value = (salt || brand).replace(/\b\w/g, c => c.toUpperCase());
+            medMfgInput.value = mfg;
+            const targetRadio = document.querySelector(`input[value="${type}"]`);
+            if(targetRadio) targetRadio.checked = true;
+            openModal();
+        };
+
+        globalSearchInput.addEventListener('input', (e) => {
+            clearTimeout(globalSearchTimer);
+            const query = e.target.value.trim();
+            if (query.length < 2) {
+                globalGrid.innerHTML = '<div id="global-loader">Start typing to search global registries...</div>';
+                return;
+            }
+            
+            globalGrid.innerHTML = '<div id="global-loader">Searching external databases...</div>';
+            
+            globalSearchTimer = setTimeout(async () => {
+                const results = await fetchExternalDB(query);
+                
+                if (results.length === 0) {
+                    globalGrid.innerHTML = '<div id="global-loader">No records found.</div>';
+                    return;
+                }
+
+                globalGrid.innerHTML = '';
+                results.forEach((data, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'med-card';
+                    card.style.animationDelay = `${index * 0.05}s`; 
+
+                    const medIcon = icons[data.mappedType] || icons['pill'];
+                    const displayBrand = data.brand || 'Unknown';
+                    const displaySalt = (data.salt && data.salt.toLowerCase() !== displayBrand.toLowerCase()) 
+                                        ? `<div class="med-salt-text">${escapeHTML(data.salt)}</div>` : '';
+                    const displayMfg = data.mfg ? `<div class="med-mfg-text">${escapeHTML(data.mfg)}</div>` : '';
+                    const sourceBadge = `<div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 6px; padding: 2px 6px; background: rgba(255,255,255,0.05); border-radius: 4px; display: inline-block;">Source: ${data.source}</div>`;
+                    
+                    const priceBadge = data.price ? `<span class="badge success">${data.price}</span>` : '';
+                    const packBadge = data.packSize ? `<span class="badge" style="background: var(--bg-panel); border: 1px solid var(--border-color);">${escapeHTML(data.packSize)}</span>` : '';
+                    
+                    let clinicalHtml = '';
+                    if (data.warnings) {
+                        const truncWarn = data.warnings.substring(0, 120) + (data.warnings.length > 120 ? '...' : '');
+                        clinicalHtml += `<div style="font-size: 0.8rem; color: var(--warning); margin-top: 0.75rem; background: var(--warning-bg); padding: 8px; border-radius: 8px;"><strong>Avoid If:</strong> ${escapeHTML(truncWarn)}</div>`;
+                    }
+                    if (data.sideEffects) {
+                        const truncSide = data.sideEffects.substring(0, 120) + (data.sideEffects.length > 120 ? '...' : '');
+                        clinicalHtml += `<div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem; background: rgba(255,255,255,0.05); padding: 8px; border-radius: 8px;"><strong>Side Effects:</strong> ${escapeHTML(truncSide)}</div>`;
+                    }
+
+                    const argBrand = escapeHTML(displayBrand).replace(/'/g, "\\'");
+                    const argSalt = escapeHTML(data.salt).replace(/'/g, "\\'");
+                    const argMfg = escapeHTML(data.mfg).replace(/'/g, "\\'");
+                    const argType = data.mappedType;
+
+                    card.innerHTML = `
+                        <div class="med-status-strip" style="background-color: #3f3f46;"></div>
+                        <div class="med-header" style="margin-bottom: 0;">
+                            <div class="med-identity">
+                                <div class="med-icon">${medIcon}</div>
+                                <div class="med-titles">
+                                    <div class="med-brand-text">${escapeHTML(displayBrand)}</div>
+                                    ${displaySalt}
+                                    ${displayMfg}
+                                    ${sourceBadge}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="med-body" style="margin-top: 1rem;">
+                            <div class="badge-container">${priceBadge}${packBadge}</div>
+                            ${clinicalHtml}
+                        </div>
+                        <div class="med-footer">
+                            <button class="btn-secondary" onclick="prefillAndOpenModal('${argBrand}', '${argSalt}', '${argMfg}', '${argType}')">
+                                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                Add to Stock
+                            </button>
+                        </div>
+                    `;
+                    globalGrid.appendChild(card);
+                });
+            }, 500);
+        });
+
+        // --- FEATURE 3: Firebase Auth & Inventory Sync ---
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
                 document.getElementById('user-email').textContent = user.email;
                 fetchInventory();
-                fetchHistory();
             } else {
                 window.location.href = 'https://gautam-anurag.github.io/qubit/account/login';
             }
         });
 
+        const inventoryGrid = document.getElementById('medicine-grid');
+        const inventorySearchInput = document.getElementById('inventory-search');
+
         function fetchInventory() {
-            const q = query(collection(db, 'users', currentUser.uid, 'medicines'), orderBy('createdAt', 'desc'));
+            const medicinesRef = collection(db, 'users', currentUser.uid, 'medicines');
+            const q = query(medicinesRef, orderBy('createdAt', 'desc'));
+
             onSnapshot(q, (snapshot) => {
                 localInventory = []; 
-                snapshot.forEach(docSnap => localInventory.push({ id: docSnap.id, ...docSnap.data() }));
-                renderInventory(document.getElementById('inventory-search').value); 
-                renderRegimen();
-                renderRestock();
-            });
-        }
-
-        function fetchHistory() {
-            const q = query(collection(db, 'users', currentUser.uid, 'logs'), orderBy('timestamp', 'desc'), limit(100));
-            onSnapshot(q, (snapshot) => {
-                localLogs = [];
-                snapshot.forEach(docSnap => localLogs.push({ id: docSnap.id, ...docSnap.data() }));
-                renderHistory();
-            });
-        }
-
-        // --- View 1: Regimen Engine ---
-        function renderRegimen() {
-            const container = document.getElementById('regimen-container');
-            container.innerHTML = '';
-            
-            const scheduleGroups = { "Morning": [], "Afternoon": [], "Evening": [], "Night": [] };
-            let hasRegimen = false;
-
-            localInventory.forEach(med => {
-                if (med.schedule && Array.isArray(med.schedule)) {
-                    med.schedule.forEach(time => {
-                        if (scheduleGroups[time]) {
-                            scheduleGroups[time].push(med);
-                            hasRegimen = true;
-                        }
-                    });
-                }
-            });
-
-            if (!hasRegimen) {
-                container.innerHTML = '<div id="loader">No daily schedule set. Add a medicine and select a schedule block.</div>';
-                return;
-            }
-
-            for (const [time, meds] of Object.entries(scheduleGroups)) {
-                if (meds.length === 0) continue;
-                
-                const groupHeader = document.createElement('div');
-                groupHeader.className = 'section-header';
-                groupHeader.textContent = time;
-                container.appendChild(groupHeader);
-                
-                const grid = document.createElement('div');
-                grid.className = 'medicine-grid';
-
-                meds.forEach((data, index) => {
-                    const card = document.createElement('div');
-                    card.className = 'med-card';
-                    card.style.animationDelay = `${index * 0.05}s`;
-                    const qty = parseInt(data.quantity);
-                    const brand = data.brand || data.name || 'Unknown';
-                    const salts = data.salts || brand;
-                    const argBrand = escapeHTML(brand).replace(/'/g, "\\'");
-                    const argSalts = escapeHTML(salts).replace(/'/g, "\\'");
-
-                    card.innerHTML = `
-                        <div class="med-status-strip" style="background-color: ${qty > 0 ? 'var(--primary)' : 'var(--danger)'};"></div>
-                        <div class="med-header" style="margin-bottom: 0;">
-                            <div class="med-identity">
-                                <div class="med-icon">${icons[data.type] || icons['pill']}</div>
-                                <div class="med-titles">
-                                    <div class="med-brand-text">${escapeHTML(brand)}</div>
-                                    <div class="med-salt-text">${qty} remaining</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="med-footer" style="margin-top: 1.25rem;">
-                            <button class="btn-ai-insights" onclick="openAIModal('${argBrand}', '${argSalts}')">
-                                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                                AI Side Effects & Insights
-                            </button>
-                            <button class="btn-action" onclick="logDose('${data.id}', '${argBrand}', ${qty}, '${time}')" ${qty <= 0 ? 'disabled' : ''}>
-                                Take Dose
-                            </button>
-                        </div>
-                    `;
-                    grid.appendChild(card);
+                snapshot.forEach(docSnap => {
+                    localInventory.push({ id: docSnap.id, ...docSnap.data() });
                 });
-                container.appendChild(grid);
-            }
+                renderInventory(inventorySearchInput.value); 
+            });
         }
 
-        // --- Logging Dose ---
-        window.logDose = async (id, name, currentQty, timeScheduled) => {
-            if (currentQty <= 0) return showToast("Out of stock!", "error");
-            try {
-                await updateDoc(doc(db, 'users', currentUser.uid, 'medicines', id), { quantity: increment(-1) });
-                await addDoc(collection(db, 'users', currentUser.uid, 'logs'), {
-                    medicineId: id, name: name, scheduledTime: timeScheduled || "Ad-hoc", timestamp: serverTimestamp()
-                });
-                showToast(`Logged dose of ${name}`, "success");
-            } catch (error) {
-                showToast("Failed to log dose.", "error");
-            }
-        };
-
-        // --- View 2: Inventory Grid ---
-        document.getElementById('inventory-search').addEventListener('input', (e) => renderInventory(e.target.value));
+        inventorySearchInput.addEventListener('input', (e) => {
+            renderInventory(e.target.value);
+        });
 
         function renderInventory(filterText = '') {
-            const grid = document.getElementById('medicine-grid');
-            grid.innerHTML = '';
+            inventoryGrid.innerHTML = '';
+            
             if (localInventory.length === 0) {
-                grid.innerHTML = '<div id="loader">Your stock is currently empty.</div>';
-                document.getElementById('inventory-count').textContent = '0 items';
+                inventoryGrid.innerHTML = '<div id="loader">Your stock is currently empty.</div>';
+                document.getElementById('inventory-count').textContent = '0 items tracked';
                 return;
             }
+
             const lowerFilter = filterText.toLowerCase();
+            
             let filtered = localInventory.filter(item => {
                 if (!filterText) return true;
-                return (item.brand||'').toLowerCase().includes(lowerFilter) || (item.salts||'').toLowerCase().includes(lowerFilter);
-            });
-            filtered.sort((a, b) => new Date(a.expiryDate) - new Date(b.expiryDate));
-            document.getElementById('inventory-count').textContent = `${filtered.length} item(s) tracked`;
-
-            filtered.forEach((data, index) => {
-                const card = document.createElement('div');
-                card.className = 'med-card';
-                card.style.animationDelay = `${index * 0.05}s`; 
-                const qty = parseInt(data.quantity);
-                const daysToExpiry = Math.ceil((new Date(data.expiryDate) - new Date().setHours(0,0,0,0)) / (1000 * 3600 * 24));
-                
-                let badgesHTML = '';
-                let statusColor = (qty < 5 || daysToExpiry < 0) ? 'var(--danger)' : (daysToExpiry <= 30) ? 'var(--warning)' : 'var(--success)'; 
-                if (qty < 5) badgesHTML += `<span class="badge danger">Low Stock (${qty})</span>`;
-                if (daysToExpiry < 0) badgesHTML += `<span class="badge danger">Expired</span>`;
-                else if (daysToExpiry <= 30) badgesHTML += `<span class="badge warning">Expiring in ${daysToExpiry}d</span>`;
-                
-                const argBrand = escapeHTML(data.brand || '').replace(/'/g, "\\'");
-                const argSalts = escapeHTML(data.salts || data.brand || '').replace(/'/g, "\\'");
-
-                card.innerHTML = `
-                    <div class="med-status-strip" style="background-color: ${statusColor};"></div>
-                    <div class="med-header">
-                        <div class="med-identity">
-                            <div class="med-icon">${icons[data.type] || icons['pill']}</div>
-                            <div class="med-titles">
-                                <div class="med-brand-text">${escapeHTML(data.brand)}</div>
-                                <div class="med-salt-text">${escapeHTML(data.salts || '')}</div>
-                            </div>
-                        </div>
-                        <div class="med-actions">
-                            <button onclick="deleteDoc(doc(db, 'users', currentUser.uid, 'medicines', '${data.id}'))"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
-                        </div>
-                    </div>
-                    <div class="med-body">
-                        <div class="badge-container">${badgesHTML}</div>
-                        <div class="med-details">Expires: <strong>${new Date(data.expiryDate).toLocaleDateString()}</strong></div>
-                    </div>
-                    <div class="med-footer">
-                        <button class="btn-ai-insights" onclick="openAIModal('${argBrand}', '${argSalts}')" style="margin-bottom: 0.5rem;">
-                            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                            AI Side Effects & Insights
-                        </button>
-                        <div class="qty-controls">
-                            <button class="qty-btn" onclick="updateQuantity('${data.id}', ${qty}, -1)">-</button>
-                            <span class="qty-display">${qty}</span>
-                            <button class="qty-btn" onclick="updateQuantity('${data.id}', ${qty}, 1)">+</button>
-                        </div>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        window.updateQuantity = async (id, currentQty, change) => {
-            if (currentQty + change < 0) return; 
-            await updateDoc(doc(db, 'users', currentUser.uid, 'medicines', id), { quantity: increment(change) });
-        };
-
-        // --- View 3: Restock & Purchase List ---
-        function renderRestock() {
-            const grid = document.getElementById('restock-grid');
-            grid.innerHTML = '';
-
-            const restockItems = localInventory.filter(item => {
-                const qty = parseInt(item.quantity);
-                const daysToExpiry = Math.ceil((new Date(item.expiryDate) - new Date().setHours(0,0,0,0)) / (1000 * 3600 * 24));
-                return qty < 5 || daysToExpiry <= 30;
+                const brand = (item.brand || item.name || '').toLowerCase();
+                const salts = (item.salts || '').toLowerCase();
+                const type = (item.type || '').toLowerCase();
+                const mfg = (item.manufacturer || '').toLowerCase();
+                return brand.includes(lowerFilter) || salts.includes(lowerFilter) || type.includes(lowerFilter) || mfg.includes(lowerFilter);
             });
 
-            if (restockItems.length === 0) {
-                grid.innerHTML = '<div id="loader" style="color: var(--success);">Stock is healthy. No items require restock!</div>';
+            // SMART SORTING: Sort by Expiry Date (Urgent dates first)
+            filtered.sort((a, b) => {
+                const aDays = Math.ceil((new Date(a.expiryDate) - new Date()) / (1000 * 3600 * 24));
+                const bDays = Math.ceil((new Date(b.expiryDate) - new Date()) / (1000 * 3600 * 24));
+                return aDays - bDays;
+            });
+
+            document.getElementById('inventory-count').textContent = `${filtered.length} item${filtered.length !== 1 ? 's' : ''} tracked`;
+
+            if (filtered.length === 0) {
+                inventoryGrid.innerHTML = '<div id="loader">No matching medicines found in your stock.</div>';
                 return;
             }
 
-            restockItems.forEach((data, index) => {
-                const card = document.createElement('div');
-                card.className = 'med-card';
-                card.style.animationDelay = `${index * 0.05}s`; 
-                const qty = parseInt(data.quantity);
-                const daysToExpiry = Math.ceil((new Date(data.expiryDate) - new Date().setHours(0,0,0,0)) / (1000 * 3600 * 24));
-                
-                let reason = qty < 5 ? `Low Stock (${qty} remaining)` : `Expiring in ${daysToExpiry} days`;
-                const argBrand = escapeHTML(data.brand || '').replace(/'/g, "\\'");
-                const argSalts = escapeHTML(data.salts || data.brand || '').replace(/'/g, "\\'");
+            filtered.forEach((data, index) => renderInventoryCard(data.id, data, index));
+        }
 
-                card.innerHTML = `
-                    <div class="med-status-strip" style="background-color: var(--warning);"></div>
-                    <div class="med-header">
-                        <div class="med-identity">
-                            <div class="med-icon">${icons[data.type] || icons['pill']}</div>
-                            <div class="med-titles">
-                                <div class="med-brand-text">${escapeHTML(data.brand)}</div>
-                                <div class="med-salt-text">${escapeHTML(data.salts || '')}</div>
-                            </div>
+        function renderInventoryCard(id, data, index) {
+            const card = document.createElement('div');
+            card.className = 'med-card';
+            card.style.animationDelay = `${index * 0.05}s`; 
+
+            const qty = parseInt(data.quantity);
+            const expDate = new Date(data.expiryDate);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); 
+            expDate.setHours(0, 0, 0, 0);
+            const daysToExpiry = Math.ceil((expDate - today) / (1000 * 3600 * 24));
+
+            let badgesHTML = '';
+            let statusColor = 'var(--success)'; 
+            
+            if (qty < 5 || daysToExpiry < 0) {
+                statusColor = 'var(--danger)';
+            } else if (daysToExpiry <= 30) {
+                statusColor = 'var(--warning)';
+            }
+
+            if (qty < 5) badgesHTML += `<span class="badge danger">Low Stock (${qty})</span>`;
+            if (daysToExpiry < 0) badgesHTML += `<span class="badge danger">Expired</span>`;
+            else if (daysToExpiry <= 30) badgesHTML += `<span class="badge warning">Expiring in ${daysToExpiry} days</span>`;
+            else badgesHTML += `<span class="badge success">Healthy Stock</span>`;
+
+            const medIcon = icons[data.type] || icons['pill'];
+            const displayBrand = data.brand || data.name || 'Unknown';
+            const displaySalt = (data.salts && data.salts.toLowerCase() !== displayBrand.toLowerCase()) 
+                                ? `<div class="med-salt-text">${escapeHTML(data.salts)}</div>` : '';
+            const displayMfg = data.manufacturer ? `<div class="med-mfg-text">${escapeHTML(data.manufacturer)}</div>` : '';
+
+            card.innerHTML = `
+                <div class="med-status-strip" style="background-color: ${statusColor};"></div>
+                <div class="med-header">
+                    <div class="med-identity">
+                        <div class="med-icon">${medIcon}</div>
+                        <div class="med-titles">
+                            <div class="med-brand-text">${escapeHTML(displayBrand)}</div>
+                            ${displaySalt}
+                            ${displayMfg}
                         </div>
                     </div>
-                    <div class="med-body">
-                        <div class="badge-container"><span class="badge warning">${reason}</span></div>
-                    </div>
-                    <div class="med-footer">
-                        <button class="btn-ai-insights" onclick="openAIModal('${argBrand}', '${argSalts}')">
-                            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                            AI Side Effects & Insights
+                    <div class="med-actions">
+                        <button onclick="deleteMedicine('${id}')" title="Delete">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                         </button>
                     </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        // Copy Restock List to Clipboard
-        document.getElementById('copy-restock-btn').addEventListener('click', () => {
-            const restockItems = localInventory.filter(item => {
-                const qty = parseInt(item.quantity);
-                const daysToExpiry = Math.ceil((new Date(item.expiryDate) - new Date().setHours(0,0,0,0)) / (1000 * 3600 * 24));
-                return qty < 5 || daysToExpiry <= 30;
-            });
-
-            if (restockItems.length === 0) return showToast("No items to copy!", "error");
-
-            let text = "🏥 Qubit Pharmacy Restock List:\n";
-            restockItems.forEach((item, i) => {
-                text += `${i + 1}. ${item.brand} (${item.salts || 'Standard Formulation'}) - Current Qty: ${item.quantity}\n`;
-            });
-
-            navigator.clipboard.writeText(text).then(() => {
-                showToast("Restock list copied to clipboard!", "success");
-            }).catch(() => showToast("Failed to copy list.", "error"));
-        });
-
-        // --- FEATURE: Per-Salt Clinical AI Summary Engine ---
-        window.openAIModal = async (brand, saltsString) => {
-            document.getElementById('ai-modal-subtitle').textContent = `${brand} • Composition Analysis`;
-            const body = document.getElementById('ai-modal-body');
-            body.innerHTML = '<div id="loader">Deconstructing active generic salts and fetching clinical labels...</div>';
-            aiModal.classList.add('open');
-
-            // Parse salts into individual components
-            const rawSalts = saltsString ? saltsString.split(/[+,/]/) : [brand];
-            const cleanSalts = rawSalts.map(s => s.trim().replace(/[^a-zA-Z0-9\s]/g, '')).filter(s => s.length > 2);
-
-            if (cleanSalts.length === 0) {
-                body.innerHTML = '<div id="loader" style="color: var(--danger);">No specific salt parameters identified.</div>';
-                return;
-            }
-
-            // Fetch clinical FDA labels for all salts in parallel
-            const fetchPromises = cleanSalts.map(salt => 
-                fetch(`https://api.fda.gov/drug/label.json?search=openfda.generic_name:"${salt}*"&limit=1`)
-                .then(r => r.ok ? r.json() : null)
-                .catch(() => null)
-            );
-
-            const results = await Promise.all(fetchPromises);
-            body.innerHTML = '';
-
-            cleanSalts.forEach((salt, idx) => {
-                const card = document.createElement('div');
-                card.className = 'ai-salt-card';
+                </div>
                 
-                const fdaData = results[idx]?.results?.[0];
-                let warnings = fdaData ? (fdaData.contraindications?.[0] || fdaData.warnings?.[0] || "No critical contraindications documented.") : null;
-                let sideEffects = fdaData ? (fdaData.adverse_reactions?.[0] || "No standard adverse reactions documented.") : null;
-
-                if (warnings && warnings.length > 250) warnings = warnings.substring(0, 250) + '...';
-                if (sideEffects && sideEffects.length > 250) sideEffects = sideEffects.substring(0, 250) + '...';
-
-                const warningHtml = warnings ? `<div class="ai-box warning">${escapeHTML(warnings)}</div>` : '<div class="ai-box side-effects">Clinical warning data unavailable for this specific salt variant. Consult physician.</div>';
-                const sideEffectHtml = sideEffects ? `<div class="ai-box side-effects">${escapeHTML(sideEffects)}</div>` : '';
-
-                card.innerHTML = `
-                    <div class="ai-salt-header">
-                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                        Salt Active: ${escapeHTML(salt)}
+                <div class="med-body">
+                    <div class="badge-container">${badgesHTML}</div>
+                    <div class="med-details">
+                        <div>Expires: <strong>${new Date(data.expiryDate).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</strong></div>
                     </div>
-                    <div class="ai-section-title">When to Avoid / Precautions</div>
-                    ${warningHtml}
-                    <div class="ai-section-title">Potential Side Effects</div>
-                    ${sideEffectHtml}
-                `;
-                body.appendChild(card);
-            });
-        };
-
-        // --- View 4: History Timeline ---
-        function renderHistory() {
-            const container = document.getElementById('history-timeline');
-            container.innerHTML = '';
-            if (localLogs.length === 0) {
-                container.innerHTML = '<div id="loader">No history recorded yet.</div>';
-                return;
-            }
-
-            let currentDateStr = '';
-            localLogs.forEach((log, index) => {
-                if (!log.timestamp) return; 
-                const logDate = log.timestamp.toDate();
-                const dateStr = logDate.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
-                const timeStr = logDate.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
-
-                if (dateStr !== currentDateStr) {
-                    const dateHeader = document.createElement('div');
-                    dateHeader.className = 'section-header';
-                    dateHeader.style.marginLeft = '-16px'; 
-                    dateHeader.textContent = dateStr;
-                    container.appendChild(dateHeader);
-                    currentDateStr = dateStr;
-                }
-
-                const item = document.createElement('div');
-                item.className = 'timeline-item';
-                item.style.animationDelay = `${(index % 10) * 0.05}s`;
-                item.innerHTML = `
-                    <div class="timeline-dot"></div>
-                    <div class="timeline-content">
-                        <div class="timeline-time">${timeStr} • ${log.scheduledTime}</div>
-                        <div class="timeline-title">${escapeHTML(log.name)}</div>
+                </div>
+                
+                <div class="med-footer">
+                    <div class="qty-controls">
+                        <button class="qty-btn" onclick="updateQuantity('${id}', ${qty}, -1)">-</button>
+                        <span class="qty-display">${qty}</span>
+                        <button class="qty-btn" onclick="updateQuantity('${id}', ${qty}, 1)">+</button>
                     </div>
-                `;
-                container.appendChild(item);
-            });
+                </div>
+            `;
+            inventoryGrid.appendChild(card);
         }
 
-        // --- View 5: Global Search Engine ---
-        const globalSearchInput = document.getElementById('global-db-search');
-        const globalGrid = document.getElementById('global-db-grid');
-        let globalSearchTimer;
-
-        globalSearchInput.addEventListener('input', (e) => {
-            clearTimeout(globalSearchTimer);
-            const queryStr = e.target.value.trim();
-            if (queryStr.length < 2) {
-                globalGrid.innerHTML = '<div id="global-loader">Start typing to search global registries...</div>';
-                return;
-            }
-            globalGrid.innerHTML = '<div id="global-loader">Searching external databases...</div>';
-            globalSearchTimer = setTimeout(async () => {
-                try {
-                    const res = await fetch(`https://api.fda.gov/drug/label.json?search=openfda.brand_name:"${queryStr}*"&limit=10`);
-                    if (!res.ok) throw new Error();
-                    const data = await res.json();
-                    globalGrid.innerHTML = '';
-                    data.results.forEach((item, index) => {
-                        const openfda = item.openfda || {};
-                        const brand = openfda.brand_name?.[0] || 'Unknown';
-                        const salts = openfda.generic_name?.[0] || '';
-                        const mfg = openfda.manufacturer_name?.[0] || '';
-                        
-                        const card = document.createElement('div');
-                        card.className = 'med-card';
-                        card.style.animationDelay = `${index * 0.05}s`;
-                        
-                        const argBrand = escapeHTML(brand).replace(/'/g, "\\'");
-                        const argSalts = escapeHTML(salts || brand).replace(/'/g, "\\'");
-
-                        card.innerHTML = `
-                            <div class="med-status-strip" style="background-color: #3f3f46;"></div>
-                            <div class="med-header">
-                                <div class="med-identity">
-                                    <div class="med-icon">${icons['pill']}</div>
-                                    <div class="med-titles">
-                                        <div class="med-brand-text">${escapeHTML(brand)}</div>
-                                        <div class="med-salt-text">${escapeHTML(salts)}</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="med-footer">
-                                <button class="btn-ai-insights" onclick="openAIModal('${argBrand}', '${argSalts}')">
-                                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                                    AI Side Effects & Insights
-                                </button>
-                            </div>
-                        `;
-                        globalGrid.appendChild(card);
-                    });
-                } catch (e) {
-                    globalGrid.innerHTML = '<div id="global-loader">No global records found.</div>';
-                }
-            }, 500);
-        });
-
-        // --- Database Add Operation ---
+        // --- Database Operations ---
         document.getElementById('add-medicine-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('submit-btn'); btn.disabled = true;
+            const btn = document.getElementById('submit-btn');
+            btn.textContent = 'Adding...';
+            btn.disabled = true;
 
             const brand = document.getElementById('med-brand').value;
             const salts = document.getElementById('med-salts').value;
@@ -1021,22 +1098,53 @@
             const qty = document.getElementById('med-qty').value;
             const exp = document.getElementById('med-exp').value;
             const type = document.querySelector('input[name="med-type"]:checked').value;
-            
-            const schedule = [];
-            document.querySelectorAll('.schedule-chip input:checked').forEach(cb => schedule.push(cb.value));
 
             try {
-                await addDoc(collection(db, 'users', currentUser.uid, 'medicines'), {
-                    brand, salts, manufacturer: mfg, quantity: parseInt(qty), expiryDate: exp, type, schedule, createdAt: serverTimestamp()
+                const medicinesRef = collection(db, 'users', currentUser.uid, 'medicines');
+                await addDoc(medicinesRef, {
+                    brand: brand,
+                    salts: salts,
+                    manufacturer: mfg,
+                    quantity: parseInt(qty),
+                    expiryDate: exp,
+                    type: type,
+                    createdAt: serverTimestamp()
                 });
-                addModal.classList.remove('open');
-                showToast("Medicine added!", "success");
+                
+                closeModal();
+                showToast("Medicine added to inventory!", "success");
             } catch (error) {
-                showToast("Failed to add.", "error");
-            } finally { btn.disabled = false; }
+                showToast("Failed to add medicine.", "error");
+            } finally {
+                btn.textContent = 'Add to Stock';
+                btn.disabled = false;
+            }
         });
-        
-        document.getElementById('logout-btn').addEventListener('click', () => signOut(auth).then(() => window.location.href = 'https://gautam-anurag.github.io/qubit/account/login'));
+
+        window.updateQuantity = async (id, currentQty, change) => {
+            const newQty = currentQty + change;
+            if (newQty < 0) return; 
+            await updateDoc(doc(db, 'users', currentUser.uid, 'medicines', id), { quantity: newQty });
+        };
+
+        window.deleteMedicine = async (id) => {
+            if (!confirm("Remove this item from your stock?")) return;
+            await deleteDoc(doc(db, 'users', currentUser.uid, 'medicines', id));
+            showToast("Medicine removed.", "success");
+        };
+
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            signOut(auth).then(() => window.location.href = 'https://gautam-anurag.github.io/qubit/account/login');
+        });
+
+        // --- PWA Service Worker Registration ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(err => {
+                    console.log('Service Worker registration failed: ', err);
+                });
+            });
+        }
     </script>
 </body>
 </html>

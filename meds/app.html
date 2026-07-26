@@ -1175,7 +1175,7 @@
                 return aDays - bDays;
             });
 
-            document.getElementById('inventory-count').textContent = `${filtered.length} item${filtered.length !== 1 ? 's' : ''} tracked`;
+            document.getElementById('inventory-count').textContent = `${filtered.length} medicine${filtered.length !== 1 ? 's' : ''} in list`;
 
             if (filtered.length === 0) {
                 inventoryGrid.innerHTML = '<div id="loader">No matching medicines found in your list.</div>';

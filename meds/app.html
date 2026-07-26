@@ -1209,7 +1209,7 @@
             if (qty < 5) badgesHTML += `<span class="badge danger">Low Quantity (${qty})</span>`;
             if (daysToExpiry < 0) badgesHTML += `<span class="badge danger">Expired</span>`;
             else if (daysToExpiry <= 30) badgesHTML += `<span class="badge warning">Expiring in ${daysToExpiry} days</span>`;
-            else badgesHTML += `<span class="badge success">Healthy Quantity</span>`;
+            else badgesHTML += `<span class="badge success">Healthy</span>`;
 
             const medIcon = icons[data.type] || icons['pill'];
             const displayBrand = data.brand || data.name || 'Unknown';

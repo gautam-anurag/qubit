@@ -1,0 +1,1642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#f3f4f6" id="theme-color-meta">
+    <title>Dashboard | Qubit</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" href="https://gautam-base.github.io/assets/brand/qubit/qubit-icon.png" type="image/x-icon">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const metaTheme = document.getElementById('theme-color-meta');
+            if (savedTheme === 'dark' || (!savedTheme && systemDark)) {
+                document.documentElement.classList.add('dark');
+                metaTheme.setAttribute('content', '#000000');
+            } else {
+                document.documentElement.classList.remove('dark');
+                metaTheme.setAttribute('content', '#f3f4f6');
+            }
+        })();
+    </script>
+    <style>
+        :root {
+            --bg-page: #f3f4f6;
+            --bg-sidebar: #ffffff;
+            --bg-card: #ffffff;
+            --bg-glass: rgba(255, 255, 255, 0.9);
+            --bg-hover: #f9fafb;
+            --bg-active: #eff6ff;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --text-light: #9ca3af;
+            --border-color: #e5e7eb;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success: #10b981;
+            --scrollbar-thumb: #d1d5db;
+            --scrollbar-thumb-hover: #9ca3af;
+            --color-timetrekker: #ef4444;
+            --color-swiftinvoice: #0d9488; 
+            --color-datastudio: #7c3aed;   
+            --radius-xl: 24px;
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --radius-pill: 999px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+            --shadow-island: 0 8px 30px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0,0,0,0.03);
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        html.dark {
+            --bg-page: #000000;
+            --bg-sidebar: #09090b;
+            --bg-card: #121212;
+            --bg-glass: rgba(25, 25, 25, 0.85);
+            --bg-hover: #27272a;
+            --bg-active: rgba(59, 130, 246, 0.15); 
+            --text-main: #f9fafb;
+            --text-muted: #a1a1aa;
+            --text-light: #525252;
+            --border-color: #27272a;
+            --primary: #3b82f6;
+            --primary-hover: #60a5fa;
+            --scrollbar-thumb: #27272a;
+            --scrollbar-thumb-hover: #52525b;
+            --shadow-sm: none;
+            --shadow-card: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+            --shadow-island: 0 10px 40px -10px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255,255,255,0.05);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        ::-webkit-scrollbar { width: 12px; height: 12px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 99px; border: 3px solid transparent; background-clip: content-box; transition: background-color 0.2s ease; }
+        ::-webkit-scrollbar-thumb:hover { background-color: var(--scrollbar-thumb-hover); }
+        * { scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) transparent; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden; 
+            transition: background-color 0.3s ease;
+        }
+        .sidebar {
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @media (min-width: 1024px) {
+            .sidebar { 
+                width: 260px; 
+                position: static; 
+                transform: translateX(0); 
+                z-index: 50;
+            }
+        }
+        .sidebar.open { transform: translateX(0); }
+        .brand-section { padding: 1.75rem 1.5rem; display: flex; align-items: center; justify-content: space-between; }
+        .brand-logo-container { display: flex; align-items: center; gap: 0.75rem; }
+        .brand-logo { width: 32px; height: 32px; }
+        .brand-name { font-weight: 800; font-size: 1.25rem; letter-spacing: -0.02em; }
+        .sidebar-close-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 0.5rem; border-radius: 8px; display: flex; transition: var(--transition); }
+        .sidebar-close-btn:hover { background-color: var(--bg-hover); color: var(--text-main); }
+        @media (min-width: 1024px) { .sidebar-close-btn { display: none; } }
+        .nav-links { padding: 1rem; flex: 1; }
+        .nav-section-label { font-size: 0.75rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.05em; padding: 0 0.75rem; margin-bottom: 0.5rem; margin-top: 1.5rem; }
+        .nav-section-label:first-child { margin-top: 0; }
+        .nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.65rem 0.75rem; color: var(--text-muted); text-decoration: none; border-radius: var(--radius-md); font-weight: 500; font-size: 0.9rem; transition: var(--transition); margin-bottom: 0.25rem; }
+        .nav-item:hover { background-color: var(--bg-hover); color: var(--text-main); }
+        .nav-item.active { background-color: var(--bg-active); color: var(--primary); }
+        .nav-item i { font-size: 1.25rem; opacity: 0.8; }
+        .nav-item.active i { opacity: 1; }
+        .user-profile { padding: 1.2rem 1rem; background-color: var(--bg-sidebar); margin-top: auto; }
+        .user-card { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; border-radius: 50px; transition: var(--transition); cursor: default; background-color: var(--bg-hover); border: 1px solid var(--border-color); }
+        .user-avatar { width: 36px; height: 36px; border-radius: 50%; background-color: var(--bg-card); overflow: hidden; display: flex; align-items: center; justify-content: center; color: var(--text-main); font-weight: 600; flex-shrink: 0; border: 1px solid var(--border-color); }
+        .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .user-info { overflow: hidden; flex: 1; }
+        .user-name { font-size: 0.85rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-email { font-size: 0.7rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .main-wrapper { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            position: relative; 
+            width: 100%;
+        }
+        .header-container {
+            position: sticky;
+            top: 10px;
+            left: 0; right: 0;
+            padding: 0 1rem;
+            pointer-events: none;
+            z-index: 30;
+            margin-bottom: -60px;
+        }
+        .header-pill {
+            pointer-events: auto;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: var(--bg-glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: var(--radius-pill);
+            box-shadow: var(--shadow-island);
+            padding: 0.35rem 0.5rem 0.35rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            transition: var(--transition);
+        }
+        .search-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-muted);
+        }
+        .search-input {
+            width: 100%; border: none; background: transparent;
+            font-size: 0.95rem; color: var(--text-main); padding: 0.5rem 0;
+        }
+        .search-input:focus { outline: none; }
+        .search-input::placeholder { color: var(--text-light); font-weight: 400; }
+        .search-icon { font-size: 1.1rem; color: var(--text-muted); flex-shrink: 0; }
+        .header-actions {
+            display: flex; align-items: center; gap: 0.25rem;
+            padding-left: 0.5rem; border-left: 1px solid var(--border-color);
+        }
+        .btn-icon {
+            background: none; border: none; color: var(--text-muted);
+            cursor: pointer; width: 36px; height: 36px; border-radius: 50%;
+            transition: var(--transition); display: flex; align-items: center; justify-content: center; position: relative;
+        }
+        .btn-icon:hover { color: var(--text-main); background-color: var(--bg-hover); }
+        .btn-icon.active { color: var(--primary); background-color: var(--bg-active); }
+        .notification-dot {
+            position: absolute; top: 8px; right: 8px; width: 7px; height: 7px;
+            background-color: #ef4444; border-radius: 50%; border: 1px solid var(--bg-card);
+        }
+        .menu-btn { display: flex; align-items: center; justify-content: center; margin-right: 0.5rem; color: var(--text-main); cursor: pointer; background: none; border: none; }
+        @media (min-width: 1024px) { .menu-btn { display: none; } }
+        .content-scroll { 
+            flex: 1; 
+            padding: 0;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .apps-container { padding: 2rem; max-width: 1200px; margin: 0 auto; }
+        @media (max-width: 768px) { .apps-container { padding: 1.5rem; } }
+        .hero-section {
+            margin: 0;
+            border: none;
+            border-radius: 0;
+            padding: 9rem 0 5rem 0; 
+            width: 100%;
+            background: 
+                radial-gradient(circle at 90% 10%, rgba(37, 99, 235, 0.06) 0%, transparent 60%),
+                radial-gradient(circle at 10% 80%, rgba(13, 148, 136, 0.06) 0%, transparent 60%);
+            text-align: left;
+            position: relative;
+        }
+        .hero-content-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        @media (min-width: 1024px) {
+            body {
+                height: 100vh;
+                overflow: hidden; 
+                flex-direction: row;
+            }
+            .main-wrapper {
+                height: 100%;
+                overflow: hidden; 
+            }
+            .header-container {
+                position: absolute;
+                top: 1.5rem;
+                margin-bottom: 0;
+            }
+            .content-scroll {
+                height: 100%;
+                overflow-y: auto; 
+                padding: 0 2rem;
+            }
+            .hero-section {
+                margin: 0 auto;
+                margin-top: 7rem;
+                margin-bottom: 4rem;
+                box-shadow: var(--shadow-island);
+                border-radius: 32px;
+                padding: 6rem 3rem;
+                width: auto;
+                max-width: 1200px;
+                background: 
+                    radial-gradient(70% 70% at 90% 10%, rgba(37, 99, 235, 0.08) 0%, transparent 120%),
+                    radial-gradient(70% 70% at 10% 90%, rgba(13, 148, 136, 0.08) 0%, transparent 120%);
+            }
+            .hero-content-wrapper { padding: 0; }
+            .apps-container { padding: 0 0 4rem 0; }
+        }
+        html.dark .hero-section {
+            border-color: var(--border-color);
+        }
+        html.dark .hero-section {
+            background: 
+                radial-gradient(circle at 90% 10%, rgba(59, 130, 246, 0.1) 0%, transparent 60%),
+                radial-gradient(circle at 10% 80%, rgba(13, 148, 136, 0.08) 0%, transparent 60%);
+        }
+        @media (min-width: 1024px) {
+            html.dark .hero-section {
+                 background: 
+                    radial-gradient(70% 70% at 90% 10%, rgba(59, 130, 246, 0.15) 0%, transparent 160%),
+                    radial-gradient(70% 70% at 10% 90%, rgba(13, 148, 136, 0.1) 0%, transparent 210%);
+            }
+        }
+        @media (max-width: 768px) { 
+            .hero-content-wrapper { padding: 0 1.5rem; }
+        }
+        .welcome-title { font-size: 2.5rem; font-weight: 800; margin-bottom: 0.75rem; letter-spacing: -0.03em; }
+        @media (max-width: 768px) { .welcome-title { font-size: 2rem; } }
+        .quote-box {
+            display: inline-flex; align-items: center; gap: 0.75rem;
+            color: var(--text-muted); font-size: 1rem; font-style: italic;
+            background-color: var(--bg-card); padding: 0.6rem 1.2rem;
+            border-radius: 99px; border: 1px solid var(--border-color);
+            margin-top: 0.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+        .quote-box i { color: var(--primary); }
+        .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2.5rem; }
+        .section-title { font-size: 1.25rem; font-weight: 700; color: var(--text-main); }
+        .btn-edit {
+            font-size: 0.9rem; font-weight: 600; color: var(--primary);
+            background: none; border: none; cursor: pointer;
+            padding: 0.25rem 0.75rem; border-radius: 6px;
+            transition: var(--transition);
+        }
+        .btn-edit:hover { background-color: var(--bg-active); }
+        .apps-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem; padding-bottom: 4rem;
+        }
+        .app-card {
+            background-color: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl); padding: 1.75rem;
+            display: flex; flex-direction: column; transition: var(--transition);
+            text-decoration: none; color: var(--text-main); position: relative;
+            box-shadow: var(--shadow-sm); overflow: hidden;
+            transform-origin: center;
+        }
+        .remove-badge {
+            position: absolute; top: 12px; right: 12px;
+            width: 28px; height: 28px; background-color: #ef4444;
+            color: white; border-radius: 50%; border: 2px solid var(--bg-card);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 20; opacity: 0; transform: scale(0.5);
+            pointer-events: none; transition: var(--transition);
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+        }
+        .apps-grid.edit-mode .remove-badge {
+            opacity: 1; transform: scale(1); pointer-events: auto;
+        }
+        @keyframes shake {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(1deg); }
+            50% { transform: rotate(0deg); }
+            75% { transform: rotate(-1deg); }
+            100% { transform: rotate(0deg); }
+        }
+        .apps-grid.edit-mode .app-card.app-item {
+            animation: shake 0.3s infinite ease-in-out;
+            border-color: var(--primary);
+            cursor: default;
+        }
+        .app-card.hidden { display: none !important; }
+        .app-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%;
+            background-color: transparent; transition: var(--transition);
+        }
+        .app-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-card);}
+        .apps-grid.edit-mode .app-card:hover { transform: none; box-shadow: var(--shadow-sm); }
+        .app-card.timetrekker:hover::before { background-color: var(--color-timetrekker); }
+        .app-card.swiftinvoice:hover::before { background-color: var(--color-swiftinvoice); }
+        .app-card.datastudio:hover::before { background-color: var(--color-datastudio); }
+        .app-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.25rem; }
+        .app-icon {
+            width: 64px; height: 64px; border-radius: 18px;
+            background-color: var(--bg-hover); display: flex; align-items: center; justify-content: center;
+            color: var(--text-main); font-size: 2rem; transition: var(--transition);
+            box-shadow: inset 0 0 0 1px var(--border-color);
+        }
+        .app-card.timetrekker .app-icon { color: var(--color-timetrekker); background-color: rgba(239, 68, 68, 0.1); }
+        .app-card.swiftinvoice .app-icon { color: var(--color-swiftinvoice); background-color: rgba(13, 148, 136, 0.1); }
+        .app-card.datastudio .app-icon { color: var(--color-datastudio); background-color: rgba(124, 58, 237, 0.1); }
+        .app-card:hover .app-icon { color: white; box-shadow: none; }
+        .app-card.timetrekker:hover .app-icon { background-color: var(--color-timetrekker); }
+        .app-card.swiftinvoice:hover .app-icon { background-color: var(--color-swiftinvoice); }
+        .app-card.datastudio:hover .app-icon { background-color: var(--color-datastudio); }
+        .app-badge { font-size: 0.7rem; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 99px; background-color: rgba(16, 185, 129, 0.1); color: var(--success); text-transform: uppercase; letter-spacing: 0.05em; }
+        .app-name { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .app-desc { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 2rem; flex: 1; }
+        .app-footer { display: flex; align-items: center; justify-content: flex-end; padding-top: 1.25rem; border-top: 1px solid var(--border-color); }
+        .btn-launch { font-size: 0.9rem; font-weight: 600; color: white; background-color: var(--primary); padding: 0.5rem 1rem; border-radius: 8px; display: flex; align-items: center; gap: 0.5rem; transition: var(--transition); }
+        .app-card:hover .btn-launch { background-color: var(--primary-hover); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+        .notification-panel {
+            position: absolute; top: 60px; right: 0; left: 0; margin: auto; width: 90%; max-width: 320px;
+            background-color: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg); box-shadow: var(--shadow-card);
+            z-index: 40; transform: translateY(-10px); opacity: 0; pointer-events: none;
+            transition: var(--transition); display: flex; flex-direction: column;
+        }
+        @media (min-width: 768px) { .notification-panel { right: 2rem; left: auto; } }
+        .notification-panel.open { transform: translateY(0); opacity: 1; pointer-events: auto; }
+        .notif-header { padding: 1rem; border-bottom: 1px solid var(--border-color); font-weight: 600; font-size: 0.95rem; }
+        .notif-body { max-height: 300px; overflow-y: auto; }
+        .notif-item { padding: 1rem; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; color: var(--text-muted); }
+        .notif-item strong { display: block; color: var(--text-main); margin-bottom: 0.25rem; }
+        .overlay { position: fixed; inset: 0; background-color: rgba(0,0,0,0.5); z-index: 40; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; backdrop-filter: blur(4px); }
+        .overlay.open { opacity: 1; pointer-events: auto; }
+        .skeleton { background: linear-gradient(90deg, var(--bg-hover) 25%, var(--border-color) 50%, var(--bg-hover) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 6px; color: transparent !important; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .toast {
+            position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: var(--text-main); color: var(--bg-page);
+            padding: 0.75rem 1.5rem; border-radius: 99px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            font-size: 0.9rem; font-weight: 600;
+            opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 200; display: flex; align-items: center; gap: 0.5rem;
+            pointer-events: none;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .toast.success { background: var(--text-main); color: var(--bg-page); }
+        .toast.error { background: #ef4444; color: white; }
+        
+        .account-center-view {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding-top: 4rem;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+            padding-bottom: 2rem;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .account-center-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+        @media (min-width: 768px) {
+            .account-center-grid { grid-template-columns: 340px 1fr; }
+        }
+        .identity-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-card);
+            text-align: center;
+            height: fit-content;
+        }
+        .identity-cover {
+            height: 140px;
+            background: 
+                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+            position: relative;
+        }
+        .identity-avatar-wrapper {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: var(--bg-card);
+            border: 5px solid var(--bg-card);
+            margin: -60px auto 1rem;
+            position: relative;
+            z-index: 2;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 3.5rem; color: var(--text-light);
+            transition: transform 0.3s ease;
+        }
+        .identity-avatar-wrapper:hover { transform: scale(1.05); }
+        .identity-avatar-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+        .identity-content { padding: 0 2rem 2.5rem; }
+        .identity-name { font-size: 1.4rem; font-weight: 800; margin-bottom: 0.25rem; letter-spacing: -0.02em; }
+        .identity-email { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem; word-break: break-all; }
+        .provider-badges { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem; }
+        .badge {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            padding: 0.35rem 0.75rem; border-radius: 99px;
+            font-size: 0.75rem; font-weight: 600;
+            background-color: var(--bg-hover); border: 1px solid var(--border-color);
+            color: var(--text-muted);
+        }
+        .badge.google { color: var(--text-main); }
+        .badge.email { color: #DB4437; background-color: rgba(219, 68, 55, 0.08); border-color: rgba(219, 68, 55, 0.15); }
+        .settings-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: 2.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+        .settings-header { 
+            display: flex; align-items: center; gap: 0.75rem; 
+            margin-bottom: 2rem; padding-bottom: 1rem; 
+            border-bottom: 1px solid var(--border-color); 
+        }
+        .settings-title { font-size: 1.1rem; font-weight: 700; }
+        .settings-icon { color: var(--primary); font-size: 1.4rem; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-muted); }
+        .input-group { position: relative; }
+        .input-group i {
+            position: absolute; left: 1rem; top: 50%; transform: translateY(-50%);
+            color: var(--text-light); font-size: 1.2rem; pointer-events: none;
+            transition: color 0.2s ease;
+        }
+        .form-input { 
+            width: 100%; 
+            padding: 0.85rem 1rem 0.85rem 2.8rem;
+            border-radius: var(--radius-md); 
+            border: 1px solid var(--border-color); 
+            background-color: var(--bg-page); 
+            color: var(--text-main); 
+            font-size: 0.95rem; 
+            transition: var(--transition); 
+        }
+        .form-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); background-color: var(--bg-card); }
+        .form-input:focus + i { color: var(--primary); } 
+        .form-input:disabled { opacity: 0.7; cursor: not-allowed; background-color: var(--bg-hover); color: var(--text-muted); }
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--bg-sidebar);
+            border: none;
+            padding: 0.85rem 1.5rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            box-shadow: 0 2px 5px rgba(37, 99, 235, 0.2);
+        }
+        .btn-primary:hover { background-color: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+        .btn-primary:active { transform: translateY(0); }
+        .btn-primary:disabled { opacity: 0.7; cursor: wait; transform: none; }
+        .divider-text { 
+            display: flex; align-items: center; color: var(--text-light); 
+            font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; 
+            margin: 2.5rem 0 1.5rem; text-transform: uppercase; 
+        }
+        .divider-text::before, .divider-text::after { content: ''; flex: 1; height: 1px; background-color: var(--border-color); }
+        .divider-text::before { margin-right: 1rem; }
+        .divider-text::after { margin-left: 1rem; }
+        .btn-google-link {
+            background-color: var(--bg-card);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+        .btn-google-link:hover {
+            background-color: var(--bg-hover);
+        }
+        @media (max-width: 768px) {
+            .account-center-view {
+                padding-left: 1rem; 
+                padding-right: 1rem;
+            }
+            .settings-card {
+                padding: 1.25rem;
+                border-radius: var(--radius-lg); 
+            }
+            .identity-content {
+                padding-left: 1.25rem;
+                padding-right: 1.25rem;
+            }
+        }
+
+        .help-hero {
+            text-align: center;
+            padding: 9rem 1.5rem 5rem;
+            background: radial-gradient(circle at 50% 50%, rgba(37, 99, 235, 0.05) 0%, transparent 70%);
+        }
+        .help-title { font-size: 2rem; font-weight: 800; margin-bottom: 1rem; letter-spacing: -0.02em; }
+        .help-subtitle { color: var(--text-muted); max-width: 500px; margin: 0 auto 2rem; font-size: 1rem; }
+        .faq-search-wrapper {
+            max-width: 600px; margin: 0 auto; position: relative;
+        }
+        .faq-search-input {
+            width: 100%; padding: 1rem 1rem 1rem 3rem;
+            border-radius: 99px; border: 1px solid var(--border-color);
+            background-color: var(--bg-card); color: var(--text-main);
+            box-shadow: var(--shadow-sm); font-size: 1rem; transition: var(--transition);
+        }
+        .faq-search-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 4px 20px rgba(37, 99, 235, 0.15); }
+        .faq-search-icon { position: absolute; left: 1.2rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 1.2rem; }
+
+        .help-grid {
+            display: grid; grid-template-columns: 1fr; gap: 2rem;
+            max-width: 1000px; margin: 0 auto; padding-bottom: 4rem;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+        @media (min-width: 768px) { .help-grid { grid-template-columns: 2fr 1fr; } }
+
+        .faq-section { background-color: var(--bg-card); border-radius: var(--radius-xl); border: 1px solid var(--border-color); overflow: hidden; }
+        .faq-header { padding: 1.5rem; border-bottom: 1px solid var(--border-color); font-weight: 700; font-size: 1.1rem; }
+        .faq-item { border-bottom: 1px solid var(--border-color); }
+        .faq-item:last-child { border-bottom: none; }
+        .faq-question {
+            width: 100%; padding: 1.25rem 1.5rem; text-align: left; background: none; border: none;
+            color: var(--text-main); font-weight: 600; font-size: 0.95rem; cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center; transition: background-color 0.2s;
+        }
+        .faq-question:hover { background-color: var(--bg-hover); }
+        .faq-question i { transition: transform 0.3s ease; color: var(--text-light); }
+        .faq-item.active .faq-question i { transform: rotate(180deg); color: var(--primary); }
+        .faq-answer {
+            padding: 0 1.5rem 1.5rem 1.5rem; color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;
+            display: none; animation: slideDown 0.2s ease-out;
+        }
+        .faq-item.active .faq-answer { display: block; }
+
+        .support-card {
+            background-color: var(--bg-card); border-radius: var(--radius-xl);
+            border: 1px solid var(--border-color); padding: 1.5rem; position: sticky; top: 2rem;
+        }
+        .support-icon { 
+            width: 48px; height: 48px; border-radius: 12px; background-color: rgba(37, 99, 235, 0.1); 
+            color: var(--primary); display: flex; align-items: center; justify-content: center; 
+            font-size: 1.5rem; margin-bottom: 1rem; 
+        }
+        .contact-btn { width: 100%; margin-top: 1rem; }
+        
+        .settings-view {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding-top: 4rem;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+            padding-bottom: 2rem;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .settings-card-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+        }
+        @media (max-width: 600px) {
+            .settings-card-row { flex-direction: column; align-items: flex-start; }
+            .settings-card-row .btn-primary { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay" id="sidebar-overlay"></div>
+    <div id="toast" class="toast">
+        <i class="ph-fill ph-check-circle"></i>
+        <span id="toast-message">Operation successful</span>
+    </div>
+    <div class="notification-panel" id="notif-panel">
+        <div class="notif-header">Notifications</div>
+        <div class="notif-body">
+            <div class="notif-item">
+                <strong>Welcome to Qubit</strong>
+                Your dashboard is ready.
+            </div>
+            <div class="notif-item">
+                <strong>New Apps Available</strong>
+                Meds and Loan Ledger have been added.
+            </div>
+        </div>
+        <div style="padding: 0.75rem; text-align: center; font-size: 0.8rem; color: var(--primary); cursor: pointer; border-top: 1px solid var(--border-color); color: #2563eb;">
+            Mark all read
+        </div>
+    </div>
+    <aside class="sidebar" id="sidebar">
+        <div>
+            <div class="brand-section">
+                <div class="brand-logo-container">
+                    <img src="https://gautam-anurag.github.io/qubit/assets/brand/qubit/qubit-icon.png" alt="Logo" class="brand-logo">
+                    <span class="brand-name">Qubit</span>
+                </div>
+                <button class="sidebar-close-btn" id="sidebar-close-btn">
+                    <i class="ph ph-x" style="font-size: 1.5rem;"></i>
+                </button>
+            </div>
+            <nav class="nav-links">
+                <div class="nav-section-label">Platform</div>
+                <a href="?view=dashboard" class="nav-item active" id="nav-dashboard">
+                    <i class="ph ph-squares-four"></i>
+                    Dashboard
+                </a>
+                <div class="nav-section-label">Account</div>
+                <a href="?view=account-center" class="nav-item" id="nav-account-center">
+                    <i class="ph ph-user-circle"></i>
+                    Account Center
+                </a>
+                <div class="nav-section-label">Support</div>
+                <a href="?view=help" class="nav-item" id="nav-help">
+                    <i class="ph ph-lifebuoy"></i>
+                    Help Center
+                </a>
+                <a href="?view=settings" class="nav-item" id="nav-settings">
+                    <i class="ph ph-gear"></i>
+                    Settings
+                </a>
+            </nav>
+        </div>
+        <div class="user-profile">
+            <div class="user-card">
+                <div class="user-avatar" id="avatar-container">
+                    <div class="skeleton" style="width:100%;height:100%"></div>
+                </div>
+                <div class="user-info">
+                    <div class="user-name skeleton" id="user-name" style="width: 80%; height: 14px; margin-bottom: 4px;"></div>
+                    <div class="user-email skeleton" id="user-email" style="width: 60%; height: 12px;"></div>
+                </div>
+                <button id="logoutBtn" class="btn-icon" title="Sign Out" style="margin-left: auto; padding: 4px;">
+                    <i class="ph ph-sign-out" style="color: #ef4444;"></i>
+                </button>
+            </div>
+        </div>
+    </aside>
+    <div class="main-wrapper">
+        <div class="header-container">
+            <header class="header-pill">
+                <button class="menu-btn" id="menu-toggle">
+                    <i class="ph ph-list" style="font-size: 1.3rem;"></i>
+                </button>
+                <div class="search-container">
+                    <i class="ph ph-magnifying-glass search-icon"></i>
+                    <input type="text" id="app-search" class="search-input" placeholder="Search apps...">
+                </div>
+                <div class="header-actions">
+                    <button class="btn-icon" id="notif-btn" aria-label="Notifications">
+                        <i class="ph ph-bell" style="font-size:1.15rem;"></i>
+                        <span class="notification-dot"></span>
+                    </button>
+                    <button id="themeToggle" class="btn-icon" aria-label="Toggle Theme">
+                        <i class="ph ph-sun" id="icon-sun" style="font-size:1.15rem; display:none;"></i>
+                        <i class="ph ph-moon" id="icon-moon" style="font-size:1.15rem;"></i>
+                    </button>
+                </div>
+            </header>
+        </div>
+        <div class="content-scroll">
+            <div id="dashboard-view">
+                <div class="hero-section">
+                    <div class="hero-content-wrapper">
+                        <h1 class="welcome-title" id="greeting-text">Welcome back</h1>
+                        <div class="quote-box" id="daily-quote">
+                            <i class="ph-fill ph-quotes"></i>
+                            <span>Loading inspiration...</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="apps-container">
+                    <div class="section-header">
+                        <h2 class="section-title">My Apps</h2>
+                        <button id="edit-apps-btn" class="btn-edit">Edit</button>
+                    </div>
+                    <div class="apps-grid fade-in" id="apps-grid" style="animation-delay: 0.2s;">
+                        <a href="https://gautam-anurag.github.io/timetrekker/application" class="app-card app-item timetrekker" data-name="timetrekker productivity time" data-id="timetrekker">
+                            <div class="remove-badge">
+                                <i class="ph-bold ph-x"></i>
+                            </div>
+                            <div class="app-header">
+                                <div class="app-icon">
+                                    <i class="ph-fill ph-mountains"></i>
+                                </div>
+                                <span class="app-badge">Active</span>
+                            </div>
+                            <div class="app-name">TimeTrekker</div>
+                            <p class="app-desc">Production-grade focus timer and task manager. Track pomodoros, manage projects, and analyze productivity.</p>
+                            <div class="app-footer">
+                                <div class="btn-launch">
+                                    <span>Launch</span>
+                                    <i class="ph-bold ph-arrow-right"></i>
+                                </div>
+                            </div>
+                        </a>
+                        <a href="https://gautam-anurag.github.io/swiftinvoice/application" class="app-card app-item swiftinvoice" data-name="swiftinvoice invoice pdf finance" data-id="swiftinvoice">
+                            <div class="remove-badge">
+                                <i class="ph-bold ph-x"></i>
+                            </div>
+                            <div class="app-header">
+                                <div class="app-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="32" height="32">
+                                      <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                                    </svg>
+                                </div>
+                                <span class="app-badge">Active</span>
+                            </div>
+                            <div class="app-name">SwiftInvoice</div>
+                            <p class="app-desc">Create professional invoices instantly. Manage clients, generate PDF reports, and track your billing history.</p>
+                            <div class="app-footer">
+                                <div class="btn-launch">
+                                    <span>Launch</span>
+                                    <i class="ph-bold ph-arrow-right"></i>
+                                </div>
+                            </div>
+                        </a>
+                        <a href="https://gautam-anurag.github.io/swiftinvoice/studio" class="app-card app-item datastudio" data-name="datastudio analytics finance chart" data-id="datastudio">
+                            <div class="remove-badge">
+                                <i class="ph-bold ph-x"></i>
+                            </div>
+                            <div class="app-header">
+                                <div class="app-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="32" height="32">
+                                        <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" fill="currentColor"/>
+                                    </svg>
+                                </div>
+                                <span class="app-badge">Active</span>
+                            </div>
+                            <div class="app-name">Data Studio</div>
+                            <p class="app-desc">Visual analytics for your invoice data. Track revenue trends, top clients, and financial performance.</p>
+                            <div class="app-footer">
+                                <div class="btn-launch">
+                                    <span>Launch</span>
+                                    <i class="ph-bold ph-arrow-right"></i>
+                                </div>
+                            </div>
+                        </a>
+                        <div class="app-card" style="border-style: dashed; opacity: 0.7; cursor: default;">
+                            <div class="app-header">
+                                <div class="app-icon" style="background-color: var(--bg-hover);">
+                                    <i class="ph ph-plus"></i>
+                                </div>
+                            </div>
+                            <div class="app-name">Add Module</div>
+                            <p class="app-desc">Visit the Qubit marketplace to discover new tools for your workflow.</p>
+                            <div class="app-footer" style="justify-content: space-between;">
+                                <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">Coming Soon</span>
+                                <button id="reset-apps-view" style="border:none; background:none; font-size: 0.75rem; color: var(--text-light); cursor: pointer; text-decoration: underline;">Reset View</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="text-align: center; margin-top: 2rem; color: var(--text-muted); font-size: 0.8rem;">
+                        <p style="font-weight: 700; font-size: 16px;">Qubit</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="account-center-view" class="account-center-view hidden">
+                <div class="account-center-grid">
+                    <div class="identity-card">
+                        <div class="identity-cover"></div>
+                        <div class="identity-avatar-wrapper" id="profile-avatar-display">
+                            <i class="ph ph-user"></i>
+                        </div>
+                        <div class="identity-content">
+                            <h2 class="identity-name" id="display-name-big">...</h2>
+                            <p class="identity-email" id="display-email-big">...</p>
+                            <p class="identity-email" style="margin-top: 3rem; margin-bottom: 0.9rem;">Connected with</p>
+                            <div id="provider-badges" class="provider-badges">
+                                </div>
+                        </div>
+                    </div>
+                    <div class="settings-card">
+                        <div class="settings-header">
+                            <i class="ph ph-identification-card settings-icon"></i>
+                            <span class="settings-title">Personal Details</span>
+                        </div>
+                        <div id="profile-display">
+                            <div class="form-group">
+                                <label class="form-label">Full Name</label>
+                                <div class="input-group">
+                                    <i class="ph ph-user"></i>
+                                    <input type="text" id="profile-name-input" class="form-input" disabled>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Email Address</label>
+                                <div class="input-group">
+                                    <i class="ph ph-envelope"></i>
+                                    <input type="email" id="profile-email-input" class="form-input" disabled>
+                                </div>
+                                <div style="font-size: 0.75rem; color: var(--text-light); margin-top: 0.4rem; margin-left: 0.2rem;">
+                                    Managed by your login provider
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Phone Number</label>
+                                <div class="input-group">
+                                    <i class="ph ph-phone"></i>
+                                    <input type="tel" id="profile-phone-input" class="form-input" disabled>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Gender</label>
+                                <div class="input-group">
+                                    <i class="ph ph-gender-intersex"></i>
+                                    <select id="profile-gender-input" class="form-input" disabled>
+                                        <option value="" disabled selected>Select Gender</option>
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                        <option value="non-binary">Non-binary</option>
+                                        <option value="other">Other</option>
+                                        <option value="prefer-not-to-say">Prefer not to say</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Country Code</label>
+                                <div class="input-group">
+                                    <i class="ph ph-globe"></i>
+                                    <input type="text" id="profile-country-input" class="form-input" disabled>
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn-primary" id="edit-profile-btn">
+                                <i class="ph ph-pencil-simple"></i>
+                                Edit Profile
+                            </button>
+                        </div>
+                        
+                        <div id="google-link-section" class="hidden">
+                            <div class="divider-text">Account Linking</div>
+                            <div class="settings-header" style="border:none; margin-bottom: 0.5rem; padding-bottom: 0;">
+                                <i class="ph-bold ph-link settings-icon" style="color: #DB4437;"></i>
+                                <span class="settings-title">Link Google Account</span>
+                            </div>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+                                Link your Google account for faster login. You will need to sign in with the Google account associated with the same email.
+                            </p>
+                            <button type="button" id="link-google-btn" class="btn-primary btn-google-link">
+                                <svg style="margin-right:0.5rem;" viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+                                  <g transform="matrix(1, 0, 0, 1, 0, 0)">
+                                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+                                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+                                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.21-1.19-2.63z" fill="#FBBC05"></path>
+                                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+                                  </g>
+                                </svg>
+                                Continue with Google
+                            </button>
+                        </div>
+                        <div class="divider-text">Security</div>
+                        <div class="settings-header" style="border:none; margin-bottom: 0.5rem; padding-bottom: 0;">
+                            <i class="ph ph-shield-check settings-icon" style="color: var(--success);"></i>
+                            <span class="settings-title">Password & Auth</span>
+                        </div>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+                            Ensure your account is using a strong, unique password.
+                        </p>
+                        <form id="password-form">
+                            <div class="form-group">
+                                <label class="form-label">New Password</label>
+                                <div class="input-group">
+                                    <i class="ph ph-lock-key"></i>
+                                    <input type="password" id="new-password" class="form-input" placeholder="Min 6 characters">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Confirm Password</label>
+                                <div class="input-group">
+                                    <i class="ph ph-lock-key"></i>
+                                    <input type="password" id="confirm-password" class="form-input" placeholder="Re-enter password">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-primary" id="save-password-btn" style="background-color: var(--text-main);">
+                                Update Password
+                            </button>
+                        </form>
+                        
+                        <div class="divider-text" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.2);">Data & privacy</div>
+                        <div class="settings-header" style="border:none; margin-bottom: 0.5rem; padding-bottom: 0;">
+                            <i class="ph-bold ph-warning-circle settings-icon" style="color: #ef4444;"></i>
+                            <span class="settings-title" style="color: #ef4444;">Delete Account</span>
+                        </div>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+                            Permanently delete your account and all associated data. This action cannot be undone.
+                        </p>
+                        <button type="button" id="delete-account-btn" class="btn-primary" style="background-color: #fee2e2; color: #ef4444; border: 1px solid #fecaca; box-shadow: none; transition: all 0.2s;">
+                            Delete Account
+                        </button>
+                        </div>
+                </div>
+            </div>
+
+            <div id="help-view" class="help-view hidden fade-in">
+                <div class="help-hero">
+                    <h1 class="help-title">How can we help you?</h1>
+                    <p class="help-subtitle">Search our knowledge base or get in touch with our support team for assistance.</p>
+                    <div class="faq-search-wrapper">
+                        <i class="ph ph-magnifying-glass faq-search-icon"></i>
+                        <input type="text" id="faq-search" class="faq-search-input" placeholder="Search for answers (e.g. 'password', 'billing')...">
+                    </div>
+                </div>
+
+                <div class="container help-grid">
+                    <div class="faq-section">
+                        <div class="faq-header">Frequently Asked Questions</div>
+                        <div id="faq-list">
+                            <div class="faq-item">
+                                <button class="faq-question">
+                                    How do I reset my password?
+                                    <i class="ph ph-caret-down"></i>
+                                </button>
+                                <div class="faq-answer">
+                                    Go to the Profile tab in the sidebar. Under the "Security" section, enter your new password and confirm it. Click "Update Password" to save changes.
+                                </div>
+                            </div>
+                            <div class="faq-item">
+                                <button class="faq-question">
+                                    Is Qubit free to use?
+                                    <i class="ph ph-caret-down"></i>
+                                </button>
+                                <div class="faq-answer">
+                                    Qubit is currently in open beta and is free for all users. Premium features for modules like Qubit Meds may be introduced in the future.
+                                </div>
+                            </div>
+                            <div class="faq-item">
+                                <button class="faq-question">
+                                    How do I connect my Google Account?
+                                    <i class="ph ph-caret-down"></i>
+                                </button>
+                                <div class="faq-answer">
+                                    Navigate to your Profile. If you haven't linked an account yet, you will see a "Link Google Account" section. Click the button and follow the prompts.
+                                </div>
+                            </div>
+                            <div class="faq-item">
+                                <button class="faq-question">
+                                    Can I export my data?
+                                    <i class="ph ph-caret-down"></i>
+                                </button>
+                                <div class="faq-answer">
+                                    Data export is handled within individual apps. For example, in SwiftInvoice, you can download invoices as PDF files directly to your device.
+                                </div>
+                            </div>
+                             <div class="faq-item">
+                                <button class="faq-question">
+                                    Where is my data stored?
+                                    <i class="ph ph-caret-down"></i>
+                                </button>
+                                <div class="faq-answer">
+                                    We use Google Firebase for secure cloud storage and authentication. Your data is encrypted and stored on secure servers.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="support-card">
+                        <div class="support-icon">
+                            <i class="ph-fill ph-chat-circle-text"></i>
+                        </div>
+                        <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem;">Still need help?</h3>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+                            Our team is available Mon-Fri to assist you with any technical issues.
+                        </p>
+                        <button class="btn-primary contact-btn" id="contact-support-btn">
+                            <span>Contact Support</span>
+                        </button>
+                        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color); font-size: 0.85rem; color: var(--text-light); text-align: center;">
+                            Average response time: <span style="color: var(--success); font-weight: 600;">2 hours</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="settings-view" class="settings-view hidden fade-in">
+                <div class="section-header" style="margin-bottom: 2rem;">
+                    <h2 class="section-title">Settings</h2>
+                </div>
+                
+                <div class="settings-card" style="margin-bottom: 2rem;">
+                    <div class="settings-header">
+                        <i class="ph ph-paint-brush settings-icon"></i>
+                        <span class="settings-title">Appearance</span>
+                    </div>
+                    <div class="settings-card-row">
+                        <div>
+                            <h4 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 0.25rem;">Interface Theme</h4>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">
+                                Customize your workspace by switching between light and dark themes.
+                            </p>
+                        </div>
+                        <button id="settings-theme-btn" class="btn-primary" style="width: auto; min-width: 140px;">
+                            <i class="ph ph-moon"></i>
+                            <span>Dark Mode</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="settings-card">
+                    <div class="settings-header">
+                        <i class="ph ph-shield-check settings-icon" style="color: var(--success);"></i>
+                        <span class="settings-title">Account Center</span>
+                    </div>
+                    <div class="settings-card-row">
+                        <div>
+                            <h4 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 0.25rem;">Security & Login</h4>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">
+                                Manage your password, linked accounts, and personal details in your profile.
+                            </p>
+                        </div>
+                        <a href="?view=account-center" class="btn-primary" style="width: auto; background-color: var(--bg-hover); color: var(--text-main); border: 1px solid var(--border-color); box-shadow: none; text-decoration: none;">
+                            <i class="ph ph-user-gear"></i>
+                            <span style="padding: 0rem 1rem;">Manage Account</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut, updatePassword, deleteUser } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyDdavvZjFC1xo3reedoJyecBJCFXyo7vIM",
+            authDomain: "my-qubit.firebaseapp.com",
+            projectId: "my-qubit",
+            storageBucket: "my-qubit.firebasestorage.app",
+            messagingSenderId: "68819998084",
+            appId: "1:68819998084:web:02ff7dd40e78659ea1f9d1"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        const dom = {
+            userName: document.getElementById('user-name'),
+            userEmail: document.getElementById('user-email'),
+            avatarContainer: document.getElementById('avatar-container'),
+            logoutBtn: document.getElementById('logoutBtn'),
+            themeToggle: document.getElementById('themeToggle'),
+            iconSun: document.getElementById('icon-sun'),
+            iconMoon: document.getElementById('icon-moon'),
+            sidebar: document.getElementById('sidebar'),
+            sidebarOverlay: document.getElementById('sidebar-overlay'),
+            menuToggle: document.getElementById('menu-toggle'),
+            sidebarCloseBtn: document.getElementById('sidebar-close-btn'),
+            greetingText: document.getElementById('greeting-text'),
+            dailyQuote: document.getElementById('daily-quote'),
+            searchInput: document.getElementById('app-search'),
+            notifBtn: document.getElementById('notif-btn'),
+            notifPanel: document.getElementById('notif-panel'),
+            editBtn: document.getElementById('edit-apps-btn'),
+            appsGrid: document.getElementById('apps-grid'),
+            resetViewBtn: document.getElementById('reset-apps-view'),
+            
+            viewDashboard: document.getElementById('dashboard-view'),
+            viewAccountCenter: document.getElementById('account-center-view'),
+            viewHelp: document.getElementById('help-view'),
+            viewSettings: document.getElementById('settings-view'),
+            
+            faqSearch: document.getElementById('faq-search'),
+            contactBtn: document.getElementById('contact-support-btn'),
+            
+            settingsThemeBtn: document.getElementById('settings-theme-btn'),
+            
+            profileEmailInput: document.getElementById('profile-email-input'),
+            profileNameInput: document.getElementById('profile-name-input'),
+            profilePhoneInput: document.getElementById('profile-phone-input'),
+            profileGenderInput: document.getElementById('profile-gender-input'),
+            profileCountryInput: document.getElementById('profile-country-input'),
+            
+            profileAvatarDisplay: document.getElementById('profile-avatar-display'),
+            
+            // MAP THE NEW EDIT PROFILE BUTTON
+            editProfileBtn: document.getElementById('edit-profile-btn'),
+            
+            providerBadges: document.getElementById('provider-badges'),
+            displayNameBig: document.getElementById('display-name-big'),
+            displayEmailBig: document.getElementById('display-email-big'),
+            googleLinkSection: document.getElementById('google-link-section'),
+            linkGoogleBtn: document.getElementById('link-google-btn'),
+            passwordForm: document.getElementById('password-form'),
+            newPassword: document.getElementById('new-password'),
+            confirmPassword: document.getElementById('confirm-password'),
+            savePasswordBtn: document.getElementById('save-password-btn'),
+            deleteAccountBtn: document.getElementById('delete-account-btn'),
+            toast: document.getElementById('toast'),
+            toastMessage: document.getElementById('toast-message')
+        };
+
+        function handleRouting() {
+            const url = new URL(window.location);
+            if (!url.searchParams.has('view')) {
+                url.searchParams.set('view', 'dashboard');
+                window.history.replaceState({}, '', url);
+            }
+
+            const params = new URLSearchParams(window.location.search);
+            const viewName = params.get('view') || 'dashboard'; 
+
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            const activeLink = document.querySelector(`.nav-item[href="?view=${viewName}"]`);
+            if (activeLink) activeLink.classList.add('active');
+
+            dom.viewDashboard.classList.add('hidden');
+            dom.viewAccountCenter.classList.add('hidden');
+            dom.viewHelp.classList.add('hidden');
+            dom.viewSettings.classList.add('hidden');
+
+            if (viewName === 'dashboard') {
+                dom.viewDashboard.classList.remove('hidden');
+            } else if (viewName === 'account-center') { 
+                dom.viewAccountCenter.classList.remove('hidden');
+            } else if (viewName === 'help') {
+                dom.viewHelp.classList.remove('hidden');
+            } else if (viewName === 'settings') {
+                dom.viewSettings.classList.remove('hidden');
+                updateSettingsThemeButton();
+            }
+
+            if(window.innerWidth < 1024) {
+                dom.sidebar.classList.remove('open');
+                dom.sidebarOverlay.classList.remove('open');
+            }
+        }
+
+        document.addEventListener('click', (e) => {
+            const link = e.target.closest('a');
+            if (link && link.href.includes('?view=')) {
+                e.preventDefault();
+                const url = new URL(link.href);
+                window.history.pushState({}, '', url);
+                handleRouting();
+            }
+        });
+
+        window.addEventListener('popstate', handleRouting);
+        handleRouting();
+
+        function showToast(message, type = 'success') {
+            dom.toastMessage.textContent = message;
+            dom.toast.className = `toast ${type}`;
+            const icon = dom.toast.querySelector('i');
+            if(type === 'error') {
+                icon.className = 'ph-fill ph-warning-circle';
+            } else {
+                icon.className = 'ph-fill ph-check-circle';
+            }
+            dom.toast.classList.add('show');
+            setTimeout(() => {
+                dom.toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        document.querySelectorAll('.faq-question').forEach(button => {
+            button.addEventListener('click', () => {
+                const item = button.parentElement;
+                const isActive = item.classList.contains('active');
+                document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+                if (!isActive) item.classList.add('active');
+            });
+        });
+
+        if(dom.faqSearch) {
+            dom.faqSearch.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase();
+                document.querySelectorAll('.faq-item').forEach(item => {
+                    const question = item.querySelector('.faq-question').textContent.toLowerCase();
+                    const answer = item.querySelector('.faq-answer').textContent.toLowerCase();
+                    if(question.includes(term) || answer.includes(term)) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        }
+
+        if(dom.contactBtn) {
+            dom.contactBtn.addEventListener('click', () => {
+                const originalContent = dom.contactBtn.innerHTML;
+                dom.contactBtn.innerHTML = '<div class="skeleton" style="width:20px;height:20px;border-radius:50%;display:inline-block;vertical-align:middle;margin-right:5px;"></div> Sending...';
+                dom.contactBtn.disabled = true;
+                setTimeout(() => {
+                    showToast('Support request sent! Check your email.');
+                    dom.contactBtn.innerHTML = originalContent;
+                    dom.contactBtn.disabled = false;
+                }, 1500);
+            });
+        }
+        
+        async function syncUserProfile(user) {
+            const userRef = doc(db, 'artifacts', APP_ID, 'users', user.uid);
+            
+            const cachedRaw = localStorage.getItem(PROFILE_CACHE_KEY);
+            if (cachedRaw) {
+                try {
+                    const cachedData = JSON.parse(cachedRaw);
+                    renderProfile(cachedData, user);
+                    if (!dom.viewAccountCenter.classList.contains('hidden')) {
+                        populateProfileForm(cachedData, user);
+                    }
+                } catch (e) {
+                    console.warn("Cache parse failed, fetching fresh.");
+                }
+            }
+        
+            try {
+                const docSnap = await getDoc(userRef);
+                let userData;
+        
+                if (docSnap.exists()) {
+                    userData = docSnap.data();
+                } else {
+                    userData = {
+                        name: user.displayName || '',
+                        email: user.email || '',
+                        avatar: user.photoURL ? user.photoURL.replace(/=s\d+-c/g, '=s1024-c') : '',
+                        provider: user.providerData[0]?.providerId || 'unknown',
+                        createdAt: serverTimestamp(),
+                        tasks: 0,
+                        focus: 0
+                    };
+                    await setDoc(userRef, userData);
+                }
+        
+                localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(userData));
+                renderProfile(userData, user);
+                if (!dom.viewAccountCenter.classList.contains('hidden')) {
+                    populateProfileForm(userData, user);
+                }
+                
+                const dbName = userData.name || userData.displayName || userData.fullName;
+                const authName = user.displayName || (user.email ? user.email.split('@')[0] : 'User');
+                updateGreeting(dbName || authName);
+        
+            } catch (error) {
+                console.error("Error syncing user profile:", error);
+            }
+        }
+
+        function renderProfile(userData, authUser) {
+            dom.userName.classList.remove('skeleton');
+            dom.userEmail.classList.remove('skeleton');
+            dom.userName.style.width = 'auto'; 
+            dom.userName.style.height = 'auto';
+            dom.userEmail.style.width = 'auto'; 
+            dom.userEmail.style.height = 'auto';
+            
+            const dbName = userData.name || userData.displayName || userData.fullName;
+            const authName = authUser.displayName || (authUser.email || 'User').split('@')[0];
+            const finalName = dbName || authName;
+
+            const dbAvatar = userData.avatar || userData.photoURL || userData.picture;
+            const finalAvatar = dbAvatar || authUser.photoURL;
+            
+            dom.userEmail.textContent = userData.email || authUser.email;
+            dom.userName.textContent = finalName;
+            
+            dom.avatarContainer.innerHTML = ''; 
+            if (finalAvatar) {
+                const img = document.createElement('img');
+                img.src = finalAvatar.replace(/=s\d+-c/g, '=s256-c');
+                dom.avatarContainer.appendChild(img);
+            } else {
+                dom.avatarContainer.textContent = finalName.charAt(0).toUpperCase();
+            }
+        }
+        
+        function populateProfileForm(userData, authUser) {
+            const dbName = userData.name || userData.displayName || userData.fullName;
+            const authName = authUser.displayName || (authUser.email || 'User').split('@')[0];
+            const finalName = dbName || authName;
+
+            const dbAvatar = userData.avatar || userData.photoURL || userData.picture;
+            const finalAvatar = dbAvatar || authUser.photoURL;
+            
+            const email = userData.email || authUser.email;
+            
+            // Populate fields purely for display purposes
+            dom.profileEmailInput.value = email;
+            dom.profileNameInput.value = finalName;
+            dom.profileGenderInput.value = userData.gender || '';
+            dom.profilePhoneInput.value = userData.phone || 'Not provided';
+            dom.profileCountryInput.value = userData.country || 'Not provided';
+            
+            dom.displayNameBig.textContent = finalName;
+            dom.displayEmailBig.textContent = email;
+            
+            dom.profileAvatarDisplay.innerHTML = '';
+            if (finalAvatar) {
+                const img = document.createElement('img');
+                img.src = finalAvatar.replace(/=s\d+-c/g, '=s1024-c');
+                dom.profileAvatarDisplay.appendChild(img);
+            } else {
+                dom.profileAvatarDisplay.textContent = finalName.charAt(0).toUpperCase();
+            }
+            
+            dom.providerBadges.innerHTML = '';
+            const provider = userData.provider || authUser.providerData[0]?.providerId || 'unknown';
+            
+            if (provider.includes('google')) {
+                dom.providerBadges.innerHTML += `
+                    <div class="badge google">
+                        <svg viewBox="0 0 24 24" width="14" height="14" xmlns="http://www.w3.org/2000/svg">
+                          <g transform="matrix(1, 0, 0, 1, 0, 0)">
+                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.21-1.19-2.63z" fill="#FBBC05"></path>
+                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+                          </g>
+                        </svg> Google
+                    </div>`;
+            } else if (provider.includes('password')) {
+                dom.providerBadges.innerHTML += `<div class="badge email"><i class="ph-bold ph-envelope-simple"></i> Email</div>`;
+            }
+        
+            if (!provider.includes('google')) {
+                dom.googleLinkSection.classList.remove('hidden');
+            } else {
+                dom.googleLinkSection.classList.add('hidden');
+            }
+        }
+        
+        // NEW: Redirect to SSO Edit Profile Flow
+        dom.editProfileBtn.addEventListener('click', () => {
+            window.location.href = 'https://gautam-anurag.github.io/qubit/account/login?flow=editprofile&app=account-center';
+        });
+        
+        dom.linkGoogleBtn.addEventListener('click', async () => {
+             try {
+                const userEmail = auth.currentUser.email; 
+                await signOut(auth);
+                const baseUrl = 'https://gautam-anurag.github.io/qubit/account/login';
+                const redirectUrl = 'https://gautam-anurag.github.io/qubit/dashboard/app?view=account-center';
+                window.location.href = `${baseUrl}?redirectUrl=${encodeURIComponent(redirectUrl)}&flow=link&link_email=${encodeURIComponent(userEmail)}`;
+                
+             } catch (error) {
+                console.error('Error during sign out for linking:', error);
+                showToast('Error redirecting. Please try again.', 'error');
+             }
+        });
+
+        dom.passwordForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const user = auth.currentUser;
+            const newPass = dom.newPassword.value;
+            const confirmPass = dom.confirmPassword.value;
+            if (newPass !== confirmPass) {
+                showToast("Passwords do not match", 'error');
+                return;
+            }
+            if (newPass.length < 6) {
+                showToast("Password must be 6+ characters", 'error');
+                return;
+            }
+            const originalBtnText = dom.savePasswordBtn.textContent;
+            try {
+                dom.savePasswordBtn.disabled = true;
+                dom.savePasswordBtn.textContent = 'Updating...';
+                await updatePassword(user, newPass);
+                showToast("Password updated successfully");
+                dom.newPassword.value = '';
+                dom.confirmPassword.value = '';
+            } catch (error) {
+                console.error(error);
+                if (error.code === 'auth/requires-recent-login') {
+                    showToast("Please sign out and back in to change password", 'error');
+                } else {
+                    showToast(error.message, 'error');
+                }
+            } finally {
+                dom.savePasswordBtn.disabled = false;
+                dom.savePasswordBtn.textContent = originalBtnText;
+            }
+        });
+
+        if (dom.deleteAccountBtn) {
+            dom.deleteAccountBtn.addEventListener('click', async () => {
+                const user = auth.currentUser;
+                if (!user) return;
+
+                if (!confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+                    return;
+                }
+
+                if (!confirm("All your data will be permanently lost. Are you absolutely sure?")) {
+                    return;
+                }
+
+                const originalText = dom.deleteAccountBtn.textContent;
+                dom.deleteAccountBtn.textContent = 'Deleting...';
+                dom.deleteAccountBtn.disabled = true;
+
+                try {
+                    await deleteUser(user);
+                    alert('Your account has been deleted.');
+                    window.location.replace('https://gautam-anurag.github.io/qubit/account/login');
+                } catch (error) {
+                    console.error(error);
+                    if (error.code === 'auth/requires-recent-login') {
+                        showToast('Security: Please sign out and sign in again to delete account.', 'error');
+                    } else {
+                        showToast(error.message, 'error');
+                    }
+                    dom.deleteAccountBtn.textContent = originalText;
+                    dom.deleteAccountBtn.disabled = false;
+                }
+            });
+        }
+
+        const quotes = [
+            "Focus on being productive instead of busy.",
+            "The secret of getting ahead is getting started.",
+            "Your future is created by what you do today, not tomorrow.",
+            "Don't watch the clock; do what it does. Keep going.",
+            "Small progress is still progress."
+        ];
+        dom.dailyQuote.querySelector('span').textContent = quotes[Math.floor(Math.random() * quotes.length)];
+        
+        function updateGreeting(userName = '') {
+            const hour = new Date().getHours();
+            let greeting = 'Good evening';
+            if (hour < 12) greeting = 'Good morning';
+            else if (hour < 18) greeting = 'Good afternoon';
+            const namePart = userName ? `, ${userName.split(' ')[0]}` : '';
+            dom.greetingText.textContent = `${greeting}${namePart}`;
+        }
+        
+        updateGreeting();
+        
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                syncUserProfile(user);
+            } else {
+                localStorage.removeItem(PROFILE_CACHE_KEY);
+                window.location.replace('https://gautam-anurag.github.io/qubit/account/login?app=account-center');
+            }
+        });
+
+        let hiddenApps = JSON.parse(localStorage.getItem('qubit_hidden_apps') || '[]');
+        function applyHiddenState() {
+            document.querySelectorAll('.app-item').forEach(card => {
+                if(hiddenApps.includes(card.dataset.id)) {
+                    card.classList.add('hidden');
+                } else {
+                    card.classList.remove('hidden');
+                }
+            });
+        }
+        applyHiddenState();
+        let isEditMode = false;
+        dom.editBtn.addEventListener('click', () => {
+            isEditMode = !isEditMode;
+            dom.appsGrid.classList.toggle('edit-mode', isEditMode);
+            dom.editBtn.textContent = isEditMode ? 'Done' : 'Edit';
+            document.querySelectorAll('.app-item').forEach(card => {
+                if(isEditMode) {
+                    card.addEventListener('click', preventNav);
+                } else {
+                    card.removeEventListener('click', preventNav);
+                }
+            });
+        });
+        function preventNav(e) {
+            if(!e.target.closest('.remove-badge')) {
+                e.preventDefault(); 
+            }
+        }
+        document.querySelectorAll('.remove-badge').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault(); 
+                e.stopPropagation(); 
+                const card = btn.closest('.app-item');
+                const id = card.dataset.id;
+                card.style.opacity = '0';
+                card.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    card.classList.add('hidden');
+                    card.style.opacity = '';
+                    card.style.transform = '';
+                    hiddenApps.push(id);
+                    localStorage.setItem('qubit_hidden_apps', JSON.stringify(hiddenApps));
+                }, 200);
+            });
+        });
+        dom.resetViewBtn.addEventListener('click', () => {
+            if(confirm('Restore all hidden apps?')) {
+                hiddenApps = [];
+                localStorage.setItem('qubit_hidden_apps', JSON.stringify(hiddenApps));
+                applyHiddenState();
+            }
+        });
+        function toggleSidebar() {
+            const isOpen = dom.sidebar.classList.contains('open');
+            dom.sidebar.classList.toggle('open', !isOpen);
+            if(window.innerWidth < 1024) {
+                 dom.sidebarOverlay.classList.toggle('open', !isOpen);
+            }
+        }
+        dom.menuToggle.addEventListener('click', toggleSidebar);
+        dom.sidebarCloseBtn.addEventListener('click', toggleSidebar); 
+        dom.sidebarOverlay.addEventListener('click', toggleSidebar);
+        dom.notifBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dom.notifPanel.classList.toggle('open');
+            dom.notifBtn.classList.toggle('active');
+        });
+        document.addEventListener('click', (e) => {
+            if (!dom.notifPanel.contains(e.target) && e.target !== dom.notifBtn) {
+                dom.notifPanel.classList.remove('open');
+                dom.notifBtn.classList.remove('active');
+            }
+        });
+        dom.searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const apps = document.querySelectorAll('.app-item');
+            apps.forEach(app => {
+                const name = app.getAttribute('data-name');
+                const isDeleted = app.classList.contains('hidden') && !app.style.display; 
+                if(!isDeleted) {
+                    if(name.includes(term)) app.style.display = 'flex';
+                    else app.style.display = 'none';
+                }
+            });
+        });
+        const mediaQuery = window.matchMedia('(min-width: 1024px)');
+        function handleTabletChange(e) {
+            if (e.matches) {
+                dom.menuToggle.style.display = 'none';
+                dom.sidebar.classList.remove('open'); 
+                dom.sidebarOverlay.classList.remove('open');
+            } else {
+                dom.menuToggle.style.display = 'block';
+            }
+        }
+        mediaQuery.addListener(handleTabletChange);
+        handleTabletChange(mediaQuery);
+        dom.logoutBtn.addEventListener('click', async () => {
+            if(confirm('Are you sure you want to sign out?')) {
+                try { await signOut(auth); } catch (e) { alert('Sign out failed'); }
+            }
+        });
+
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateThemeIcon(isDark);
+            updateSettingsThemeButton();
+        }
+
+        dom.themeToggle.addEventListener('click', toggleTheme);
+        if(dom.settingsThemeBtn) {
+            dom.settingsThemeBtn.addEventListener('click', toggleTheme);
+        }
+
+        function updateThemeIcon(isDark) {
+            dom.iconSun.style.display = isDark ? 'block' : 'none';
+            dom.iconMoon.style.display = isDark ? 'none' : 'block';
+            document.getElementById('theme-color-meta').setAttribute('content', isDark ? '#000000' : '#ffffff');
+        }
+
+        function updateSettingsThemeButton() {
+            if (!dom.settingsThemeBtn) return;
+            const isDark = document.documentElement.classList.contains('dark');
+            if (isDark) {
+                dom.settingsThemeBtn.innerHTML = '<i class="ph ph-sun"></i><span>Light Mode</span>';
+            } else {
+                dom.settingsThemeBtn.innerHTML = '<i class="ph ph-moon"></i><span>Dark Mode</span>';
+            }
+        }
+        
+        updateThemeIcon(document.documentElement.classList.contains('dark'));
+    </script>
+</body>
+</html>

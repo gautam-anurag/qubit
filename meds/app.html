@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Qubit | Medicine Inventory</title>
+    <title>Qubit Meds</title>
     
     <link rel="icon" href="https://gautam-anurag.github.io/qubit/assets/qubit-icon.png" type="image/x-icon">
     <link rel="apple-touch-icon" href="https://gautam-anurag.github.io/qubit/assets/qubit-icon.png">
@@ -405,7 +405,7 @@
         <div class="nav-menu">
             <div class="nav-item active" data-target="inventory-view">
                 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
-                Available Medicines
+                Your Medicines
             </div>
             <div class="nav-item" data-target="database-view">
                 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
@@ -443,7 +443,7 @@
             <button class="menu-toggle" id="menu-toggle" aria-label="Open Menu">
                 <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
             </button>
-            <div class="view-title" id="view-title">Available Medicines</div>
+            <div class="view-title" id="view-title">Your Medicines</div>
             <div style="width: 24px;"></div> 
         </header>
 
@@ -452,7 +452,7 @@
             <div id="inventory-view" class="view active">
                 <div class="search-box">
                     <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    <input type="text" id="inventory-search" placeholder="Search your stock by brand, salt, or type...">
+                    <input type="text" id="inventory-search" placeholder="Search your medicines by salt, brand or type">
                 </div>
                 <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem; font-weight: 500;" id="inventory-count">Loading...</div>
                 
@@ -464,7 +464,7 @@
             <div id="database-view" class="view">
                 <div style="margin-bottom: 2.5rem; max-width: 600px;">
                     <p style="color: var(--text-muted); margin-bottom: 1.5rem; font-size: 1rem; line-height: 1.6;">
-                        Search the global FDA & NIH registries to identify medicines, view formulations, and instantly import them to your Qubit stock.
+                        Search the comprehensive FDA, NIH, and publicly contributed Indian registries to accurately identify medications, view formulation specs, and instantly add them to your personal medicine list.
                     </p>
                     <div class="search-box" style="max-width: 100%; margin-bottom: 0;">
                         <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
@@ -473,7 +473,7 @@
                 </div>
                 
                 <div class="medicine-grid" id="global-db-grid">
-                    <div id="global-loader">Start typing to search global registries...</div>
+                    <div id="global-loader">Search global registries...</div>
                 </div>
             </div>
 
@@ -570,7 +570,7 @@
                         </div>
                     </div>
                     
-                    <button type="submit" class="btn-primary" id="submit-btn">Add to Stock</button>
+                    <button type="submit" class="btn-primary" id="submit-btn">Add to your list</button>
                 </form>
             </div>
         </div>
@@ -957,7 +957,7 @@
                         <div class="med-footer">
                             <button class="btn-secondary" onclick="prefillAndOpenModal('${argBrand}', '${argSalt}', '${argMfg}', '${argType}')">
                                 <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                Add to Stock
+                                Add to your list
                             </button>
                         </div>
                     `;
@@ -1001,8 +1001,8 @@
             inventoryGrid.innerHTML = '';
             
             if (localInventory.length === 0) {
-                inventoryGrid.innerHTML = '<div id="loader">Your stock is currently empty.</div>';
-                document.getElementById('inventory-count').textContent = '0 items tracked';
+                inventoryGrid.innerHTML = '<div id="loader">Your medicines list is currently empty.</div>';
+                document.getElementById('inventory-count').textContent = '0 medicines in your list';
                 return;
             }
 
@@ -1027,7 +1027,7 @@
             document.getElementById('inventory-count').textContent = `${filtered.length} item${filtered.length !== 1 ? 's' : ''} tracked`;
 
             if (filtered.length === 0) {
-                inventoryGrid.innerHTML = '<div id="loader">No matching medicines found in your stock.</div>';
+                inventoryGrid.innerHTML = '<div id="loader">No matching medicines found in your list.</div>';
                 return;
             }
 
@@ -1055,10 +1055,10 @@
                 statusColor = 'var(--warning)';
             }
 
-            if (qty < 5) badgesHTML += `<span class="badge danger">Low Stock (${qty})</span>`;
+            if (qty < 5) badgesHTML += `<span class="badge danger">Low Quantity (${qty})</span>`;
             if (daysToExpiry < 0) badgesHTML += `<span class="badge danger">Expired</span>`;
             else if (daysToExpiry <= 30) badgesHTML += `<span class="badge warning">Expiring in ${daysToExpiry} days</span>`;
-            else badgesHTML += `<span class="badge success">Healthy Stock</span>`;
+            else badgesHTML += `<span class="badge success">Healthy Quantity</span>`;
 
             const medIcon = icons[data.type] || icons['pill'];
             const displayBrand = data.brand || data.name || 'Unknown';
@@ -1133,7 +1133,7 @@
             } catch (error) {
                 showToast("Failed to add medicine.", "error");
             } finally {
-                btn.textContent = 'Add to Stock';
+                btn.textContent = 'Add to your list';
                 btn.disabled = false;
             }
         });
@@ -1145,7 +1145,7 @@
         };
 
         window.deleteMedicine = async (id) => {
-            if (!confirm("Remove this item from your stock?")) return;
+            if (!confirm("Remove this item from your list?")) return;
             await deleteDoc(doc(db, 'users', currentUser.uid, 'medicines', id));
             showToast("Medicine removed.", "success");
         };

@@ -1,6 +1,7 @@
 const CACHE_NAME = 'qubit-meds-v1';
 const ASSETS_TO_CACHE = [
   './',
+  './app.html',
   'manifest.json',
   'https://gautam-anurag.github.io/qubit/assets/qubit-icon.png'
 ];

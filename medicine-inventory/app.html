@@ -357,7 +357,7 @@
             <div id="inventory-view" class="view active">
                 <div class="search-box">
                     <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    <input type="text" id="inventory-search" placeholder="Search your stock...">
+                    <input type="text" id="inventory-search" placeholder="Search your medicines...">
                 </div>
                 <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;" id="inventory-count">Loading...</div>
                 <div class="medicine-grid" id="medicine-grid">
@@ -477,7 +477,7 @@
                         </div>
                     </div>
                     
-                    <button type="submit" class="btn-primary" id="submit-btn">Add to Stock</button>
+                    <button type="submit" class="btn-primary" id="submit-btn">Add to your list</button>
                 </form>
             </div>
         </div>
@@ -766,7 +766,7 @@
                         <div style="margin-top: 1rem;">
                             <button class="btn-secondary" onclick="prefillAndOpenModal('${argBrand}', '${argSalt}', '${argMfg}', '${argType}')" style="width: 100%; justify-content: center;">
                                 <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                Add to Stock
+                                Add to your list
                             </button>
                         </div>
                     `;
@@ -782,7 +782,7 @@
                 document.getElementById('user-email').textContent = user.email;
                 fetchInventory();
             } else {
-                window.location.href = 'login.html';
+                window.location.href = 'https://gautam-anurag.github.io/qubit/account/login';
             }
         });
 
@@ -929,7 +929,7 @@
             } catch (error) {
                 alert("Failed to add medicine.");
             } finally {
-                btn.textContent = 'Add to Stock';
+                btn.textContent = 'Add to your list';
                 btn.disabled = false;
             }
         });
@@ -946,7 +946,7 @@
         };
 
         document.getElementById('logout-btn').addEventListener('click', () => {
-            signOut(auth).then(() => window.location.href = 'login.html');
+            signOut(auth).then(() => window.location.href = 'https://gautam-anurag.github.io/qubit/account/login');
         });
     </script>
 </body>

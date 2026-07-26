@@ -782,7 +782,7 @@
                 document.getElementById('user-email').textContent = user.email;
                 fetchInventory();
             } else {
-                window.location.href = 'https://gautam-anurag.github.io/qubit/account/login';
+                window.location.href = 'https://gautam-anurag.github.io/qubit/account/login?app=meds';
             }
         });
 
@@ -946,7 +946,7 @@
         };
 
         document.getElementById('logout-btn').addEventListener('click', () => {
-            signOut(auth).then(() => window.location.href = 'https://gautam-anurag.github.io/qubit/account/login');
+            signOut(auth).then(() => window.location.href = 'https://gautam-anurag.github.io/qubit/account/login?app=meds');
         });
     </script>
 </body>

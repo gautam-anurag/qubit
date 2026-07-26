@@ -1097,6 +1097,7 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         const APP_ID = 'Qubit';
+        const PROFILE_CACHE_KEY = 'qubit_user_profile_cache';
         
         const dom = {
             userName: document.getElementById('user-name'),

@@ -50,7 +50,7 @@
             </svg>
         </div>
         <div class="text-center">
-            <h2 class="text-xl font-bold tracking-tight text-white mb-1">Generating Inventory Report</h2>
+            <h2 class="text-xl font-bold tracking-tight text-white mb-1">Generating Report</h2>
             <p class="text-sm text-zinc-500 font-medium">Compiling medical data and evaluating expiry statuses...</p>
         </div>
     </div>
@@ -59,7 +59,7 @@
         document.addEventListener("DOMContentLoaded", () => {
             const rawData = localStorage.getItem('qubit_export_cache');
             if (!rawData) {
-                alert("No inventory data found. Returning to Qubit.");
+                alert("No data found. Returning to Qubit.");
                 window.history.back();
                 return;
             }
@@ -122,7 +122,7 @@
                 doc.setFont('helvetica', 'normal');
                 doc.setFontSize(10);
                 doc.setTextColor(100, 116, 139);
-                doc.text(`Medicines Inventory Audit • Generated on ${new Date().toLocaleString()}`, margin, currentY + 6);
+                doc.text(`Medicines List • Generated on ${new Date().toLocaleString()}`, margin, currentY + 6);
                 currentY += 20;
 
                 // --- 2. Five-Column KPI DASHBOARD ---
@@ -147,9 +147,9 @@
                 const gap = 3.5;
                 const cardW = (pageWidth - (margin * 2) - (gap * 4)) / 5;
                 
-                drawKPI(margin, currentY, cardW, "Total Tracked", inventory.length, [15, 23, 42]);
+                drawKPI(margin, currentY, cardW, "Total Medicines", inventory.length, [15, 23, 42]);
                 drawKPI(margin + cardW + gap, currentY, cardW, "Expired", expiredMeds.length, [220, 38, 38]); // Deep Red
-                drawKPI(margin + (cardW * 2) + (gap * 2), currentY, cardW, "Low Stock", lowStockMeds.length, [234, 88, 12]); // Orange
+                drawKPI(margin + (cardW * 2) + (gap * 2), currentY, cardW, "Low Quantity", lowStockMeds.length, [234, 88, 12]); // Orange
                 drawKPI(margin + (cardW * 3) + (gap * 3), currentY, cardW, "Expiring Soon", expiringMeds.length, [245, 158, 11]); // Amber
                 drawKPI(margin + (cardW * 4) + (gap * 4), currentY, cardW, "Healthy", healthyMeds.length, [16, 185, 129]); // Green
                 
@@ -226,10 +226,10 @@
                 };
 
                 // Render the 4 independent tables
-                renderTable("EXPIRED INVENTORY (Immediate Disposal)", expiredMeds, [220, 38, 38]);
+                renderTable("EXPIRED MEDICINES (Immediate Disposal and Replenishment)", expiredMeds, [220, 38, 38]);
                 renderTable("LOW STOCK (Replenishment Required)", lowStockMeds, [234, 88, 12]);
                 renderTable("EXPIRING SOON (Next 30 Days)", expiringMeds, [245, 158, 11]);
-                renderTable("HEALTHY INVENTORY", healthyMeds, [16, 185, 129]);
+                renderTable("HEALTHY MEDICINES", healthyMeds, [16, 185, 129]);
 
                 // --- FOOTER PAGINATION ---
                 const pageCount = doc.internal.getNumberOfPages();
@@ -238,11 +238,11 @@
                     doc.setFont('helvetica', 'normal');
                     doc.setFontSize(8);
                     doc.setTextColor(148, 163, 184);
-                    doc.text(`Qubit Meds • Inventory Audit`, margin, doc.internal.pageSize.height - 10);
+                    doc.text(`Qubit Meds • Medicine List`, margin, doc.internal.pageSize.height - 10);
                     doc.text(`Page ${i} of ${pageCount}`, pageWidth - margin, doc.internal.pageSize.height - 10, { align: 'right' });
                 }
 
-                doc.save(`Qubit_Inventory_Report_${today.toISOString().split('T')[0]}.pdf`);
+                doc.save(`Qubit_Meds_List_${today.toISOString().split('T')[0]}.pdf`);
                 localStorage.removeItem('qubit_export_cache');
                 
                 window.history.back();

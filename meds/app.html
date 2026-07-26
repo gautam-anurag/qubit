@@ -712,25 +712,48 @@
             return div.innerHTML;
         }
 
-        // --- 3-Tier Prioritized Fetch Logic (Updated for Filtering) ---
+        // --- 3-Tier Prioritized Fetch Logic (Upgraded with Advanced Caching) ---
         let indianMedDatabase = null;
         let isFetchingDB = false;
+        const queryCache = new Map(); // In-memory cache for API queries
 
         async function fetchExternalDB(searchQuery, dbPref = 'all') {
             const lowerQuery = searchQuery.toLowerCase();
+            const cacheKey = `${lowerQuery}-${dbPref}`; // Unique key based on query and selected DB
+
+            // 1. Check in-memory query cache first for instant results
+            if (queryCache.has(cacheKey)) {
+                return queryCache.get(cacheKey);
+            }
+
             const uniqueSuggestions = [];
             const seenBrands = new Set(); 
 
-            // PRIORITY 1: Indian Medicine Database
+            // PRIORITY 1: Indian Medicine Database (with Cache Storage API)
             if (dbPref === 'all' || dbPref === 'ind') {
                 if (!indianMedDatabase) {
                     if (!isFetchingDB) {
                         isFetchingDB = true;
                         try {
-                            const response = await fetch('https://raw.githubusercontent.com/junioralive/Indian-Medicine-Dataset/main/DATA/indian_medicine_data.json');
-                            if (response.ok) indianMedDatabase = await response.json();
+                            const dbUrl = 'https://raw.githubusercontent.com/junioralive/Indian-Medicine-Dataset/main/DATA/indian_medicine_data.json';
+                            
+                            // Open browser's native Cache Storage
+                            const cache = await caches.open('qubit-meds-db-v1');
+                            const cachedResponse = await cache.match(dbUrl);
+                            
+                            if (cachedResponse) {
+                                // Serve instantly from disk cache
+                                indianMedDatabase = await cachedResponse.json();
+                            } else {
+                                // Fetch from network and save to cache for next time
+                                const response = await fetch(dbUrl);
+                                if (response.ok) {
+                                    cache.put(dbUrl, response.clone()); // Clone is required before consuming JSON
+                                    indianMedDatabase = await response.json();
+                                }
+                            }
                         } catch (error) {
-                            console.error("Failed to load Indian DB:", error);
+                            console.error("Failed to load/cache Indian DB:", error);
                         }
                         isFetchingDB = false;
                     }
@@ -771,6 +794,7 @@
                 }
             }
 
+            // Set up promises for FDA and NIH based on preference
             const fetchPromises = [];
             if (dbPref === 'all' || dbPref === 'fda') {
                 fetchPromises.push(
@@ -834,6 +858,8 @@
                 });
             }
 
+            // Save the final processed results into the memory map before returning
+            queryCache.set(cacheKey, uniqueSuggestions);
             return uniqueSuggestions;
         }
 

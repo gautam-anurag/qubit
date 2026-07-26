@@ -66,11 +66,12 @@
 
             const inventory = JSON.parse(rawData);
             
-            // --- Smart Data Sorting & Categorization ---
+            // --- 1. Independent Data Categorization ---
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             
-            const criticalMeds = [];
+            const expiredMeds = [];
+            const lowStockMeds = [];
             const expiringMeds = [];
             const healthyMeds = [];
             
@@ -80,11 +81,13 @@
                 const daysToExpiry = Math.ceil((expDate - today) / (1000 * 3600 * 24));
                 const qty = parseInt(med.quantity);
                 
-                // Attach processed metadata for the table rendering
                 const processedMed = { ...med, daysToExpiry };
 
-                if (qty < 5 || daysToExpiry < 0) {
-                    criticalMeds.push(processedMed);
+                // Priority Routing: Expired overrides Low Stock
+                if (daysToExpiry < 0) {
+                    expiredMeds.push(processedMed);
+                } else if (qty < 5) {
+                    lowStockMeds.push(processedMed);
                 } else if (daysToExpiry <= 30) {
                     expiringMeds.push(processedMed);
                 } else {
@@ -92,19 +95,19 @@
                 }
             });
 
-            // Sort arrays: Urgent dates first, then by quantity
             const sortLogic = (a, b) => a.daysToExpiry - b.daysToExpiry || a.quantity - b.quantity;
-            criticalMeds.sort(sortLogic);
+            expiredMeds.sort(sortLogic);
+            lowStockMeds.sort(sortLogic);
             expiringMeds.sort(sortLogic);
             healthyMeds.sort(sortLogic);
 
             setTimeout(() => {
                 const { jsPDF } = window.jspdf;
-                const doc = new jsPDF({ orientation: 'l', unit: 'mm', format: 'a4' }); // Landscape for better data fit
+                const doc = new jsPDF({ orientation: 'l', unit: 'mm', format: 'a4' }); 
                 
                 const margin = 14;
                 const pageWidth = doc.internal.pageSize.width;
-                const brandColor = [10, 132, 255]; // Qubit Blue
+                const brandColor = [10, 132, 255]; 
                 let currentY = 20;
 
                 // --- HEADER DESIGN ---
@@ -122,7 +125,7 @@
                 doc.text(`Medical Inventory Audit • Generated on ${new Date().toLocaleString()}`, margin, currentY + 6);
                 currentY += 20;
 
-                // --- KPI DASHBOARD CARDS ---
+                // --- 2. Five-Column KPI DASHBOARD ---
                 const drawKPI = (x, y, w, title, val, color) => {
                     doc.setFillColor(248, 250, 252);
                     doc.rect(x, y, w, 22, 'F');
@@ -131,43 +134,55 @@
                     doc.rect(x, y, w, 22, 'S');
                     
                     doc.setFont('helvetica', 'bold');
-                    doc.setFontSize(8);
+                    doc.setFontSize(7.5); // Slightly smaller font to fit 5 cards
                     doc.setTextColor(100, 116, 139);
-                    doc.text(title.toUpperCase(), x + 5, y + 8);
+                    doc.text(title.toUpperCase(), x + 4, y + 8);
                     
                     doc.setFontSize(16);
                     doc.setTextColor(...color);
-                    doc.text(val.toString(), x + 5, y + 17);
+                    doc.text(val.toString(), x + 4, y + 17);
                 };
 
-                const cardW = (pageWidth - (margin * 2) - 10) / 4;
+                // Dynamically calculate width for 5 cards with a 3.5mm gap
+                const gap = 3.5;
+                const cardW = (pageWidth - (margin * 2) - (gap * 4)) / 5;
+                
                 drawKPI(margin, currentY, cardW, "Total Tracked", inventory.length, [15, 23, 42]);
-                drawKPI(margin + cardW + 3.3, currentY, cardW, "Critical / Expired", criticalMeds.length, [239, 68, 68]); // Red
-                drawKPI(margin + (cardW * 2) + 6.6, currentY, cardW, "Expiring Soon", expiringMeds.length, [245, 158, 11]); // Amber
-                drawKPI(margin + (cardW * 3) + 9.9, currentY, cardW, "Healthy Stock", healthyMeds.length, [16, 185, 129]); // Green
+                drawKPI(margin + cardW + gap, currentY, cardW, "Expired", expiredMeds.length, [220, 38, 38]); // Deep Red
+                drawKPI(margin + (cardW * 2) + (gap * 2), currentY, cardW, "Low Stock", lowStockMeds.length, [234, 88, 12]); // Orange
+                drawKPI(margin + (cardW * 3) + (gap * 3), currentY, cardW, "Expiring Soon", expiringMeds.length, [245, 158, 11]); // Amber
+                drawKPI(margin + (cardW * 4) + (gap * 4), currentY, cardW, "Healthy", healthyMeds.length, [16, 185, 129]); // Green
+                
                 currentY += 35;
 
-                // --- TABLE RENDERING LOGIC ---
+                // --- 3. UPDATED TABLE COLUMNS ---
                 const tableStyles = {
                     theme: 'grid',
                     styles: { font: 'helvetica', fontSize: 9, cellPadding: 4, textColor: [51, 65, 85], lineColor: [226, 232, 240], lineWidth: 0.1 },
                     headStyles: { fillColor: [241, 245, 249], textColor: [15, 23, 42], fontStyle: 'bold' },
                     margin: { left: margin, right: margin },
                     columnStyles: {
-                        0: { fontStyle: 'bold', cellWidth: 45 },
-                        1: { cellWidth: 60 },
-                        2: { cellWidth: 35 },
-                        3: { cellWidth: 30 },
-                        4: { cellWidth: 25, halign: 'center', fontStyle: 'bold' },
-                        5: { cellWidth: 'auto' }
+                        0: { fontStyle: 'bold', cellWidth: 42 },   // Brand
+                        1: { cellWidth: 50 },                      // Formulation
+                        2: { cellWidth: 35 },                      // Mfg
+                        3: { cellWidth: 20 },                      // Type
+                        4: { cellWidth: 15, halign: 'center' },    // Qty
+                        5: { cellWidth: 30, fontStyle: 'bold' },   // Status (NEW)
+                        6: { cellWidth: 'auto' }                   // Expiry
                     }
                 };
 
                 const formatRow = (med) => {
                     let statusStr = "Healthy";
-                    if (med.daysToExpiry < 0) statusStr = "Expired";
-                    else if (med.quantity < 5) statusStr = "Low Stock";
-                    else if (med.daysToExpiry <= 30) statusStr = "Expiring Soon";
+                    let statusColor = [16, 185, 129]; // Default Green
+                    
+                    if (med.daysToExpiry < 0) {
+                        statusStr = "Expired";
+                    } else if (med.quantity < 5) {
+                        statusStr = "Low Stock";
+                    } else if (med.daysToExpiry <= 30) {
+                        statusStr = "Expiring Soon";
+                    }
 
                     return [
                         (med.brand || med.name || 'Unknown').toUpperCase(),
@@ -175,32 +190,43 @@
                         med.manufacturer || '-',
                         med.type ? med.type.charAt(0).toUpperCase() + med.type.slice(1) : 'Pill',
                         med.quantity.toString(),
-                        `${new Date(med.expiryDate).toLocaleDateString()} (${statusStr})`
+                        statusStr, // Independent Column
+                        new Date(med.expiryDate).toLocaleDateString() // Independent Column
                     ];
                 };
 
-                // Helper to render tables dynamically
                 const renderTable = (title, data, titleColor) => {
                     if (data.length === 0) return;
                     
-                    if (currentY > 170) { doc.addPage(); currentY = 20; }
+                    if (currentY > 160) { doc.addPage(); currentY = 20; }
                     
                     doc.setFont('helvetica', 'bold');
-                    doc.setFontSize(12);
+                    doc.setFontSize(11);
                     doc.setTextColor(...titleColor);
                     doc.text(title, margin, currentY);
                     
                     doc.autoTable({
                         startY: currentY + 4,
-                        head: [['Brand / Medicine', 'Formulation', 'Manufacturer', 'Type', 'Qty', 'Expiry Date & Status']],
+                        head: [['Brand / Medicine', 'Formulation', 'Manufacturer', 'Type', 'Qty', 'Status', 'Expiry Date']],
                         body: data.map(formatRow),
-                        ...tableStyles
+                        ...tableStyles,
+                        // Optional: Dynamic text coloring for the status column
+                        didParseCell: function(data) {
+                            if (data.section === 'body' && data.column.index === 5) {
+                                const status = data.cell.raw;
+                                if (status === 'Expired') data.cell.styles.textColor = [220, 38, 38];
+                                else if (status === 'Low Stock') data.cell.styles.textColor = [234, 88, 12];
+                                else if (status === 'Expiring Soon') data.cell.styles.textColor = [245, 158, 11];
+                                else data.cell.styles.textColor = [16, 185, 129];
+                            }
+                        }
                     });
                     currentY = doc.lastAutoTable.finalY + 15;
                 };
 
-                // Render categorized tables
-                renderTable("CRITICAL ATTENTION (Low Stock or Expired)", criticalMeds, [239, 68, 68]);
+                // Render the 4 independent tables
+                renderTable("EXPIRED INVENTORY (Immediate Disposal)", expiredMeds, [220, 38, 38]);
+                renderTable("LOW STOCK (Replenishment Required)", lowStockMeds, [234, 88, 12]);
                 renderTable("EXPIRING SOON (Next 30 Days)", expiringMeds, [245, 158, 11]);
                 renderTable("HEALTHY INVENTORY", healthyMeds, [16, 185, 129]);
 
@@ -215,14 +241,12 @@
                     doc.text(`Page ${i} of ${pageCount}`, pageWidth - margin, doc.internal.pageSize.height - 10, { align: 'right' });
                 }
 
-                // --- EXECUTE EXPORT & CLEANUP ---
                 doc.save(`Qubit_Inventory_Report_${today.toISOString().split('T')[0]}.pdf`);
                 localStorage.removeItem('qubit_export_cache');
                 
-                // Return to Qubit Meds smoothly
                 window.history.back();
 
-            }, 1200); // Slight delay allows UI to render and feels like a heavy process is running
+            }, 1200); 
         });
     </script>
 </body>

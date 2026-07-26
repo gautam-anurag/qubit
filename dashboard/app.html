@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="icon" href="https://gautam-base.github.io/assets/brand/qubit/qubit-icon.png" type="image/x-icon">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="manifest" href="./manifest.json">
     <script>
         (function() {
             const savedTheme = localStorage.getItem('theme');
@@ -41,7 +42,7 @@
             --success: #10b981;
             --scrollbar-thumb: #d1d5db;
             --scrollbar-thumb-hover: #9ca3af;
-            --color-timetrekker: #ef4444;
+            --color-QubitMeds: #ef4444;
             --color-swiftinvoice: #0d9488; 
             --color-datastudio: #7c3aed;   
             --radius-xl: 24px;
@@ -337,7 +338,7 @@
         }
         .app-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-card);}
         .apps-grid.edit-mode .app-card:hover { transform: none; box-shadow: var(--shadow-sm); }
-        .app-card.timetrekker:hover::before { background-color: var(--color-timetrekker); }
+        .app-card.QubitMeds:hover::before { background-color: var(--color-QubitMeds); }
         .app-card.swiftinvoice:hover::before { background-color: var(--color-swiftinvoice); }
         .app-card.datastudio:hover::before { background-color: var(--color-datastudio); }
         .app-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.25rem; }
@@ -347,11 +348,11 @@
             color: var(--text-main); font-size: 2rem; transition: var(--transition);
             box-shadow: inset 0 0 0 1px var(--border-color);
         }
-        .app-card.timetrekker .app-icon { color: var(--color-timetrekker); background-color: rgba(239, 68, 68, 0.1); }
+        .app-card.QubitMeds .app-icon { color: var(--color-QubitMeds); background-color: rgba(239, 68, 68, 0.1); }
         .app-card.swiftinvoice .app-icon { color: var(--color-swiftinvoice); background-color: rgba(13, 148, 136, 0.1); }
         .app-card.datastudio .app-icon { color: var(--color-datastudio); background-color: rgba(124, 58, 237, 0.1); }
         .app-card:hover .app-icon { color: white; box-shadow: none; }
-        .app-card.timetrekker:hover .app-icon { background-color: var(--color-timetrekker); }
+        .app-card.QubitMeds:hover .app-icon { background-color: var(--color-QubitMeds); }
         .app-card.swiftinvoice:hover .app-icon { background-color: var(--color-swiftinvoice); }
         .app-card.datastudio:hover .app-icon { background-color: var(--color-datastudio); }
         .app-badge { font-size: 0.7rem; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 99px; background-color: rgba(16, 185, 129, 0.1); color: var(--success); text-transform: uppercase; letter-spacing: 0.05em; }
@@ -732,7 +733,7 @@
                         <button id="edit-apps-btn" class="btn-edit">Edit</button>
                     </div>
                     <div class="apps-grid fade-in" id="apps-grid" style="animation-delay: 0.2s;">
-                        <a href="https://gautam-anurag.github.io/timetrekker/application" class="app-card app-item timetrekker" data-name="timetrekker productivity time" data-id="timetrekker">
+                        <a href="https://gautam-anurag.github.io/qubit/app" class="app-card app-item meds" data-name="Qubit Medicines Inventory App" data-id="QubitMeds">
                             <div class="remove-badge">
                                 <i class="ph-bold ph-x"></i>
                             </div>
@@ -742,50 +743,8 @@
                                 </div>
                                 <span class="app-badge">Active</span>
                             </div>
-                            <div class="app-name">TimeTrekker</div>
-                            <p class="app-desc">Production-grade focus timer and task manager. Track pomodoros, manage projects, and analyze productivity.</p>
-                            <div class="app-footer">
-                                <div class="btn-launch">
-                                    <span>Launch</span>
-                                    <i class="ph-bold ph-arrow-right"></i>
-                                </div>
-                            </div>
-                        </a>
-                        <a href="https://gautam-anurag.github.io/swiftinvoice/application" class="app-card app-item swiftinvoice" data-name="swiftinvoice invoice pdf finance" data-id="swiftinvoice">
-                            <div class="remove-badge">
-                                <i class="ph-bold ph-x"></i>
-                            </div>
-                            <div class="app-header">
-                                <div class="app-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="32" height="32">
-                                      <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-                                    </svg>
-                                </div>
-                                <span class="app-badge">Active</span>
-                            </div>
-                            <div class="app-name">SwiftInvoice</div>
-                            <p class="app-desc">Create professional invoices instantly. Manage clients, generate PDF reports, and track your billing history.</p>
-                            <div class="app-footer">
-                                <div class="btn-launch">
-                                    <span>Launch</span>
-                                    <i class="ph-bold ph-arrow-right"></i>
-                                </div>
-                            </div>
-                        </a>
-                        <a href="https://gautam-anurag.github.io/swiftinvoice/studio" class="app-card app-item datastudio" data-name="datastudio analytics finance chart" data-id="datastudio">
-                            <div class="remove-badge">
-                                <i class="ph-bold ph-x"></i>
-                            </div>
-                            <div class="app-header">
-                                <div class="app-icon">
-                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="32" height="32">
-                                        <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" fill="currentColor"/>
-                                    </svg>
-                                </div>
-                                <span class="app-badge">Active</span>
-                            </div>
-                            <div class="app-name">Data Studio</div>
-                            <p class="app-desc">Visual analytics for your invoice data. Track revenue trends, top clients, and financial performance.</p>
+                            <div class="app-name">QubitMeds</div>
+                            <p class="app-desc">Production-grade medicines inventory and manager. Track inventory, manage medicines, and analyze medicines salts.</p>
                             <div class="app-footer">
                                 <div class="btn-launch">
                                     <span>Launch</span>
@@ -1639,6 +1598,20 @@
         }
         
         updateThemeIcon(document.documentElement.classList.contains('dark'));
+    </script>
+    <script>
+        // Register the Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    })
+                    .catch(err => {
+                        console.error('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
     </script>
 </body>
 </html>
